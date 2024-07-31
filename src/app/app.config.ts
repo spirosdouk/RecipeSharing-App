@@ -7,7 +7,6 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter([
       { path: '', component: AppComponent }
-      // Add your other routes here
     ]),
     provideHttpClient(),
   ]

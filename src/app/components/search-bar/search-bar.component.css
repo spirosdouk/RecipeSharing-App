@@ -1,0 +1,14 @@
+.form-inline {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .form-inline .form-control {
+    flex: 1;
+  }
+  
+  .form-inline .btn {
+    margin-left: 10px;
+  }
+  

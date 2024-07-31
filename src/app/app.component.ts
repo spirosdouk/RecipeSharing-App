@@ -1,40 +1,24 @@
 import { Component, OnInit } from '@angular/core';
-import { RecipeService } from './recipe.service';
-import { FormsModule } from '@angular/forms';
+import { RecipeService } from './services/recipe.service';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { SearchBarComponent } from './components/search-bar/search-bar.component';
+import { RecipeListComponent } from './components/recipe-list/recipe-list.component';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'app-root',
   template: `
-    <nav class="navbar navbar-light bg-light">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-          <!-- <img src="assets/logo.svg" alt="logo" width="100" height="30" class="d-inline-block align-text-top"> -->
-        </a>
-        <a class="nav-link" routerLink="/add-location">Add Location</a>
-      </div>
-    </nav>
+    <app-navbar></app-navbar>
     <main class="content container mt-3">
       <h1>Recipe List</h1>
-      <input [(ngModel)]="query" placeholder="Search recipes">
-      <button (click)="getRecipes()">Search</button>
-
-      <div *ngIf="recipes.length">
-        <div *ngFor="let recipe of recipes">
-          <h2>{{ recipe.title }}</h2>
-          <img [src]="recipe.image" alt="{{ recipe.title }}">
-          <p>Ready in {{ recipe.readyInMinutes }} minutes</p>
-        </div>
-      </div>
-      <div *ngIf="!recipes.length">
-        <p>No recipes found.</p>
-      </div>
+      <app-search-bar (search)="getRecipes($event)"></app-search-bar>
+      <app-recipe-list [recipes]="recipes"></app-recipe-list>
     </main>
-    <router-outlet></router-outlet>
   `,
-  imports: [CommonModule, FormsModule, RouterModule]
+  imports: [CommonModule, FormsModule, RouterModule, NavbarComponent, SearchBarComponent, RecipeListComponent]
 })
 export class AppComponent implements OnInit {
   title = 'homes';
@@ -44,23 +28,19 @@ export class AppComponent implements OnInit {
   constructor(private recipeService: RecipeService) {}
 
   ngOnInit(): void {
-    this.getRecipes();
+    this.getRecipes(this.query);
   }
 
-  async getRecipes(): Promise<void> {
-    console.log('Fetching recipes for query:', this.query);
-    try {
-      const data = await this.recipeService.getRecipes(this.query);
-      console.log('Recipes fetched:', data.results);
-      this.recipes = data.results.map((recipe: any) => {
-        // Ensure the image URL is complete
-        return {
-          ...recipe,
-          image: `https://spoonacular.com/recipeImages/${recipe.image}`
-        };
-      });
-    } catch (error) {
-      console.error('Error fetching recipes', error);
-    }
+  getRecipes(query: string): void {
+    console.log('Fetching recipes for query:', query);
+    this.recipeService.getRecipes(query).subscribe({
+      next: (recipes) => {
+        this.recipes = recipes;
+        console.log('Recipes fetched:', this.recipes);
+      },
+      error: (error) => {
+        console.error('Error fetching recipes', error);
+      }
+    });
   }
 }
