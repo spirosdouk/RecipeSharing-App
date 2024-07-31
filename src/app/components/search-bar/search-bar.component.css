@@ -1,14 +1,16 @@
-.form-inline {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
-  
-  .form-inline .form-control {
-    flex: 1;
-  }
-  
-  .form-inline .btn {
-    margin-left: 10px;
-  }
-  
+.search-bar {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.input-group .form-control {
+  font-size: 0.875rem;
+}
+
+.input-group-text {
+  font-size: 0.875rem;
+}
+
+.input-group .btn {
+  font-size: 0.875rem;
+}

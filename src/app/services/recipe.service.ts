@@ -13,11 +13,13 @@ export class RecipeService {
 
   constructor(private http: HttpClient) {}
 
-  getRecipes(query: string): Observable<any> {
-    const url = `${this.apiUrl}search`;
+  getRecipes(query: string, offset: number = 0, number: number = 10): Observable<any> {
+    const url = `${this.apiUrl}complexSearch`;
     const params = {
       apiKey: this.apiKey,
-      query: query
+      query: query,
+      offset: offset,
+      number: number
     };
 
     return this.http.get(url, { params }).pipe(

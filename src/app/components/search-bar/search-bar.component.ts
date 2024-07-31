@@ -6,12 +6,15 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   selector: 'app-search-bar',
   template: `
-    <div class="form-inline mb-3">
-      <input [(ngModel)]="query" placeholder="Search recipes" class="form-control mr-2">
-      <button (click)="onSearch()" class="btn btn-primary">Search</button>
+    <div class="input-group search-bar mb-3">
+      <input [(ngModel)]="query" type="search" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon">
+      <button (click)="onSearch()" class="input-group-text border-0" id="search-addon">
+        <i class="fas fa-search"></i>
+      </button>
     </div>
   `,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule],
+  styleUrls: ['./search-bar.component.css']
 })
 export class SearchBarComponent {
   query: string = '';
