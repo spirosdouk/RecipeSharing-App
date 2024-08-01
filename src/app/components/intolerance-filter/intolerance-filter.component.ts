@@ -6,8 +6,8 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-intolerance-filter',
   template:  `
     <div class="intolerance-filter">
-      <label *ngFor="let intolerance of intolerances" class="from-check-label">
-        <input type="checkbox" class="from-check-input" [value]="intolerance" (change)="onIntoleranceChange($event)">
+      <label *ngFor="let intolerance of intolerances" class="form-check-label">
+        <input type="checkbox" class="form-check-input" [value]="intolerance" (change)="onIntoleranceChange($event)">
         {{ intolerance }}
       </label>
     </div>

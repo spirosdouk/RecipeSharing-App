@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @Component({
   standalone: true,
@@ -15,14 +16,13 @@ import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
     <app-navbar></app-navbar>
     <main class="content container mt-3">
       <h1>Recipe List</h1>
-      <app-search-bar (search)="onSearch($event)" (cuisineChange)="onCuisineChange($event)" (intolerancesChange)="onIntolerancesChange($event)"></app-search-bar>
+      <app-search-bar (search)="onSearch($event)"></app-search-bar>
       <div infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollUpDistance]="1.5"
         [infiniteScrollThrottle]="150" (scrolled)="onScroll()">
         <app-recipe-list [recipes]="recipes"></app-recipe-list>
       </div>
     </main>
   `,
-  styleUrls: ['./app.component.css'],
   imports: [
     CommonModule,
     FormsModule,
@@ -30,9 +30,10 @@ import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
     NavbarComponent,
     SearchBarComponent,
     RecipeListComponent,
-    InfiniteScrollDirective
-  ]})
-
+    InfiniteScrollDirective,
+    MatDialogModule
+  ]
+})
 export class AppComponent implements OnInit {
   recipes: any[] = [];
   query: string = 'pasta';
@@ -52,20 +53,6 @@ export class AppComponent implements OnInit {
     this.query = searchParams.query;
     this.cuisine = searchParams.cuisine;
     this.intolerances = searchParams.intolerances;
-    this.recipes = [];
-    this.offset = 0;
-    this.getRecipes(this.query, this.cuisine, this.intolerances);
-  }
-
-  onCuisineChange(cuisine: string): void {
-    this.cuisine = cuisine;
-    this.recipes = [];
-    this.offset = 0;
-    this.getRecipes(this.query, this.cuisine, this.intolerances);
-  }
-
-  onIntolerancesChange(intolerances: string[]): void {
-    this.intolerances = intolerances;
     this.recipes = [];
     this.offset = 0;
     this.getRecipes(this.query, this.cuisine, this.intolerances);

@@ -2,11 +2,6 @@ import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   standalone: true,
@@ -23,7 +18,7 @@ import { MatSelectModule } from '@angular/material/select';
       </div>
       <div>
         <label *ngFor="let intolerance of intolerances" class="form-check-label">
-          <input type="checkbox" class="form-check-input" [value]="intolerance" [(ngModel)]="data.selectedIntolerances">
+          <input type="checkbox" class="form-check-input" [value]="intolerance" (change)="onIntoleranceChange($event)">
           {{ intolerance }}
         </label>
       </div>
@@ -33,15 +28,7 @@ import { MatSelectModule } from '@angular/material/select';
       <button mat-button (click)="onApply()">Apply</button>
     </div>
   `,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule
-  ]
+  imports: [CommonModule, FormsModule]
 })
 export class FilterDialogComponent {
   cuisines: string[] = [
@@ -60,6 +47,18 @@ export class FilterDialogComponent {
     public dialogRef: MatDialogRef<FilterDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { cuisine: string, selectedIntolerances: string[] }
   ) {}
+
+  onIntoleranceChange(event: any): void {
+    const intolerance = event.target.value;
+    if (event.target.checked) {
+      this.data.selectedIntolerances.push(intolerance);
+    } else {
+      const index = this.data.selectedIntolerances.indexOf(intolerance);
+      if (index > -1) {
+        this.data.selectedIntolerances.splice(index, 1);
+      }
+    }
+  }
 
   onCancel(): void {
     this.dialogRef.close();

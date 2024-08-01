@@ -1,8 +1,9 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { CuisineFilterComponent } from '../cuisine-filter-component/cuisine-filter-component';
-import { IntoleranceFilterComponent } from '../intolerance-filter/intolerance-filter.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { DialogService } from '../../services/dialog.service';
+import { FilterDialogComponent } from '../filter-dialog/filter-dialog.component';
 
 @Component({
   standalone: true,
@@ -13,11 +14,10 @@ import { IntoleranceFilterComponent } from '../intolerance-filter/intolerance-fi
       <button (click)="onSearch()" class="input-group-text border-0" id="search-addon">
         <i class="fas fa-search"></i>
       </button>
+      <button (click)="openFilterDialog()" class="btn btn-secondary ml-2">Filters</button>
     </div>
-    <app-cuisine-filter (cuisineChange)="onCuisineChange($event)"></app-cuisine-filter>
-    <app-intolerance-filter (intolerancesChange)="onIntolerancesChange($event)"></app-intolerance-filter>
   `,
-  imports: [CommonModule, FormsModule, CuisineFilterComponent, IntoleranceFilterComponent],
+  imports: [CommonModule, FormsModule, MatDialogModule],
   styleUrls: ['./search-bar.component.css']
 })
 export class SearchBarComponent {
@@ -25,20 +25,23 @@ export class SearchBarComponent {
   selectedCuisine: string = '';
   selectedIntolerances: string[] = [];
   @Output() search = new EventEmitter<{ query: string, cuisine: string, intolerances: string[] }>();
-  @Output() cuisineChange = new EventEmitter<string>();
-  @Output() intolerancesChange = new EventEmitter<string[]>();
+
+  constructor(private dialogService: DialogService) {}
 
   onSearch(): void {
     this.search.emit({ query: this.query, cuisine: this.selectedCuisine, intolerances: this.selectedIntolerances });
   }
 
-  onCuisineChange(cuisine: string): void {
-    this.selectedCuisine = cuisine;
-    this.cuisineChange.emit(cuisine);
-  }
+  async openFilterDialog(): Promise<void> {
+    const result = await this.dialogService.openFilterDialog({
+      cuisine: this.selectedCuisine,
+      selectedIntolerances: this.selectedIntolerances
+    });
 
-  onIntolerancesChange(intolerances: string[]): void {
-    this.selectedIntolerances = intolerances;
-    this.intolerancesChange.emit(intolerances);
+    if (result) {
+      this.selectedCuisine = result.cuisine;
+      this.selectedIntolerances = result.selectedIntolerances;
+      this.search.emit({ query: this.query, cuisine: this.selectedCuisine, intolerances: this.selectedIntolerances });
+    }
   }
 }
