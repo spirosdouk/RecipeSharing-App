@@ -15,7 +15,7 @@ import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
     <app-navbar></app-navbar>
     <main class="content container mt-3">
       <h1>Recipe List</h1>
-      <app-search-bar (search)="onSearch($event)"></app-search-bar>
+      <app-search-bar (search)="onSearch($event)" (cuisineChange)="onCuisineChange($event)" (intolerancesChange)="onIntolerancesChange($event)"></app-search-bar>
       <div infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollUpDistance]="1.5"
         [infiniteScrollThrottle]="150" (scrolled)="onScroll()">
         <app-recipe-list [recipes]="recipes"></app-recipe-list>
@@ -32,9 +32,12 @@ import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
     RecipeListComponent,
     InfiniteScrollDirective
   ]})
+
 export class AppComponent implements OnInit {
   recipes: any[] = [];
   query: string = 'pasta';
+  cuisine: string = '';
+  intolerances: string[] = [];
   offset: number = 0;
   limit: number = 10;
   loading: boolean = false;
@@ -42,27 +45,43 @@ export class AppComponent implements OnInit {
   constructor(private recipeService: RecipeService) {}
 
   ngOnInit(): void {
-    this.getRecipes(this.query);
+    this.getRecipes(this.query, this.cuisine, this.intolerances);
   }
 
-  onSearch(query: string): void {
-    this.query = query;
+  onSearch(searchParams: { query: string, cuisine: string, intolerances: string[] }): void {
+    this.query = searchParams.query;
+    this.cuisine = searchParams.cuisine;
+    this.intolerances = searchParams.intolerances;
     this.recipes = [];
     this.offset = 0;
-    this.getRecipes(this.query);
+    this.getRecipes(this.query, this.cuisine, this.intolerances);
+  }
+
+  onCuisineChange(cuisine: string): void {
+    this.cuisine = cuisine;
+    this.recipes = [];
+    this.offset = 0;
+    this.getRecipes(this.query, this.cuisine, this.intolerances);
+  }
+
+  onIntolerancesChange(intolerances: string[]): void {
+    this.intolerances = intolerances;
+    this.recipes = [];
+    this.offset = 0;
+    this.getRecipes(this.query, this.cuisine, this.intolerances);
   }
 
   onScroll(): void {
     if (!this.loading) {
       this.offset += this.limit;
-      this.getRecipes(this.query);
+      this.getRecipes(this.query, this.cuisine, this.intolerances);
     }
   }
 
-  getRecipes(query: string): void {
-    console.log('Fetching recipes for query:', query);
+  getRecipes(query: string, cuisine: string, intolerances: string[]): void {
+    console.log('Fetching recipes for query:', query, 'cuisine:', cuisine, 'intolerances:', intolerances);
     this.loading = true;
-    this.recipeService.getRecipes(query, this.offset, this.limit).subscribe(
+    this.recipeService.getRecipes(query, this.offset, this.limit, cuisine, intolerances).subscribe(
       (recipes) => {
         this.recipes = this.recipes.concat(recipes);
         console.log('Recipes fetched:', this.recipes);

@@ -13,14 +13,22 @@ export class RecipeService {
 
   constructor(private http: HttpClient) {}
 
-  getRecipes(query: string, offset: number = 0, number: number = 10): Observable<any> {
+  getRecipes(query: string, offset: number = 0, number: number = 10, cuisine?: string, intolerances?: string[]): Observable<any> {
     const url = `${this.apiUrl}complexSearch`;
-    const params = {
+    const params: any = {
       apiKey: this.apiKey,
       query: query,
       offset: offset,
       number: number
     };
+
+    if (cuisine) {
+      params.cuisine = cuisine;
+    }
+
+    if (intolerances && intolerances.length > 0) {
+      params.intolerances = intolerances.join(',');
+    }
 
     return this.http.get(url, { params }).pipe(
       map((response: any) => response.results.map((recipe: any) => ({
