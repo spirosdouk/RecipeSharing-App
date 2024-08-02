@@ -6,6 +6,7 @@ import { RecipeListComponent } from './components/recipe-list/recipe-list.compon
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { MatDialogModule } from '@angular/material/dialog';
 
@@ -13,13 +14,14 @@ import { MatDialogModule } from '@angular/material/dialog';
   standalone: true,
   selector: 'app-root',
   template: `
-    <app-navbar></app-navbar>
+    <app-navbar (search)="onSearch($event)"></app-navbar>
     <main class="content container mt-3">
-      <h1>Recipe List</h1>
-      <app-search-bar (search)="onSearch($event)"></app-search-bar>
       <div infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollUpDistance]="1.5"
         [infiniteScrollThrottle]="150" (scrolled)="onScroll()">
         <app-recipe-list [recipes]="recipes"></app-recipe-list>
+      </div>
+      <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+        {{ errorMessage }}
       </div>
     </main>
   `,
@@ -27,6 +29,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     CommonModule,
     FormsModule,
     RouterModule,
+    HttpClientModule,
     NavbarComponent,
     SearchBarComponent,
     RecipeListComponent,
@@ -42,6 +45,7 @@ export class AppComponent implements OnInit {
   offset: number = 0;
   limit: number = 10;
   loading: boolean = false;
+  errorMessage: string | null = null;
 
   constructor(private recipeService: RecipeService) {}
 
@@ -68,6 +72,7 @@ export class AppComponent implements OnInit {
   getRecipes(query: string, cuisine: string, intolerances: string[]): void {
     console.log('Fetching recipes for query:', query, 'cuisine:', cuisine, 'intolerances:', intolerances);
     this.loading = true;
+    this.errorMessage = null;
     this.recipeService.getRecipes(query, this.offset, this.limit, cuisine, intolerances).subscribe(
       (recipes) => {
         this.recipes = this.recipes.concat(recipes);
@@ -75,6 +80,7 @@ export class AppComponent implements OnInit {
         this.loading = false;
       },
       (error) => {
+        this.errorMessage = error;
         console.error('Error fetching recipes', error);
         this.loading = false;
       }

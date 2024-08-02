@@ -14,7 +14,7 @@ import { FilterDialogComponent } from '../filter-dialog/filter-dialog.component'
       <button (click)="onSearch()" class="input-group-text border-0" id="search-addon">
         <i class="fas fa-search"></i>
       </button>
-      <button (click)="openFilterDialog()" class="btn btn-secondary ml-2">Filters</button>
+      <!-- <button (click)="openFilterDialog()" class="btn btn-secondary ml-2">Filters</button> -->
     </div>
   `,
   imports: [CommonModule, FormsModule, MatDialogModule],

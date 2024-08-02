@@ -1,0 +1,29 @@
+.navbar-brand img {
+    max-width: 120px;
+  }
+  
+  .navbar-collapse {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  
+  .navbar-nav {
+    display: flex;
+    align-items: baseline;
+  }
+  
+  .navbar-nav .nav-item {
+    margin: 0 10px;
+  }
+  
+  .navbar-nav .nav-item .nav-link img {
+    max-width: 50px;
+    border-radius: 70%;
+  }
+  
+  .container-fluid {
+    padding-left: 170px;
+    padding-right: 200px;
+  }
+  

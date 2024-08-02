@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-recipe-list',
   template: `
     <div class="row">
-      <div class="col-12 col-md-4 mb-3" *ngFor="let recipe of recipes">
+      <div class="col-12 col-md-3 mb-3" *ngFor="let recipe of recipes">
         <div class="card h-100">
           <img [src]="recipe.image" class="card-img-top fixed-size-image" [alt]="recipe.title" [title]="recipe.title">
           <div class="card-body">
