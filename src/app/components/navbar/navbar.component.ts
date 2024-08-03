@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { SearchBarComponent } from '../search-bar/search-bar.component';
+import { SearchService } from '../../services/search.service';
 
 @Component({
   standalone: true,
@@ -17,7 +18,7 @@ import { SearchBarComponent } from '../search-bar/search-bar.component';
           </a>
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link" href="#">Recipe Page</a>
+              <a class="nav-link" routerLink="/custom-search">Custom Searching</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">My Recipes</a>
@@ -43,7 +44,9 @@ import { SearchBarComponent } from '../search-bar/search-bar.component';
 export class NavbarComponent {
   @Output() search = new EventEmitter<{ query: string, cuisine: string, intolerances: string[] }>();
 
+  constructor(private searchService: SearchService) {}
+
   onSearch(searchParams: { query: string, cuisine: string, intolerances: string[] }) {
-    this.search.emit(searchParams);
+    this.searchService.emitSearchEvent(searchParams);
   }
 }
