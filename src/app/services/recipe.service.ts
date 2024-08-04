@@ -42,7 +42,6 @@ export class RecipeService {
 
     this.http.get(this.apiUrl, { params }).pipe(
       map((response: any) => {
-        console.log('API Response:', response);
         return response.results.map((recipe: any) => ({
           ...recipe,
           image: `https://spoonacular.com/recipeImages/${recipe.id}-636x393.jpg`,
@@ -53,7 +52,7 @@ export class RecipeService {
     ).subscribe(
       (recipes) => {
         if (offset === 0) {
-          this.recipesSubject.next(recipes);  // Overwrite on initial load
+          this.recipesSubject.next(recipes);
         } else {
           const currentRecipes = this.recipesSubject.value;
           this.recipesSubject.next([...currentRecipes, ...recipes]);  // Append on scroll
@@ -79,15 +78,11 @@ export class RecipeService {
       .set('includeIngredients', ingredients)
       .set('number', '10');
 
-    console.log('Request URL:', this.apiUrl);
-    console.log('Request Params:', params.toString());
-
     this.loadingSubject.next(true);
     this.errorSubject.next(null);
 
     this.http.get(this.apiUrl, { params }).pipe(
       map((response: any) => {
-        console.log('API Response:', response);
         return response.results.map((recipe: any) => ({
           ...recipe,
           image: `https://spoonacular.com/recipeImages/${recipe.id}-636x393.jpg`,
@@ -103,5 +98,32 @@ export class RecipeService {
         this.errorSubject.next(error.message);
       }
     );
+  }
+
+  private getRecipesByCuisine(cuisine: string, number: number = 10): Observable<any[]> {
+    let params = new HttpParams()
+      .set('apiKey', this.apiKey)
+      .set('cuisine', cuisine)
+      .set('number', number.toString());
+
+    return this.http.get<any>(this.apiUrl, { params }).pipe(
+      map(response => response.results.map((recipe: any) => ({
+        ...recipe,
+        image: `https://spoonacular.com/recipeImages/${recipe.id}-636x393.jpg`,
+        sourceUrl: `https://spoonacular.com/recipes/${recipe.title.replace(/ /g, '-')}-${recipe.id}`
+      })))
+    );
+  }
+
+  getChineseRecipes(): Observable<any[]> {
+    return this.getRecipesByCuisine('Chinese');
+  }
+
+  getItalianRecipes(): Observable<any[]> {
+    return this.getRecipesByCuisine('Italian');
+  }
+
+  getFeaturedRecipes(): Observable<any[]> {
+    return this.getRecipesByCuisine('', 10);
   }
 }

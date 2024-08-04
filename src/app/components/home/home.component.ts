@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
@@ -7,6 +7,7 @@ import { SearchBarComponent } from '../search-bar/search-bar.component';
 import { RecipeListComponent } from '../recipe-list/recipe-list.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { RecipeService } from '../../services/recipe.service';
 
 @Component({
   standalone: true,
@@ -31,18 +32,52 @@ import { NavbarComponent } from '../navbar/navbar.component';
     <section class="categories">
       <div class="container">
         <h2>Popular Categories</h2>
-        <div class="category-buttons">
-          <button>Breakfast</button>
-          <button>Lunch</button>
-          <button>Dinner</button>
-          <button>Desserts</button>
+
+        <h3>Chinese Cuisine</h3>
+        <div id="chineseCarousel" class="carousel slide" data-ride="carousel">
+          <div class="carousel-inner">
+            <div *ngFor="let recipe of chineseRecipes; let i = index" [ngClass]="{'carousel-item': true, 'active': i === 0}">
+              <img [src]="recipe.image" class="d-block w-100" [alt]="recipe.title">
+              <div class="carousel-caption d-none d-md-block">
+                <h5>{{ recipe.title }}</h5>
+              </div>
+            </div>
+          </div>
+          <a class="carousel-control-prev" href="#chineseCarousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+          </a>
+          <a class="carousel-control-next" href="#chineseCarousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+          </a>
+        </div>
+
+        <h3>Italian Cuisine</h3>
+        <div id="italianCarousel" class="carousel slide" data-ride="carousel">
+          <div class="carousel-inner">
+            <div *ngFor="let recipe of italianRecipes; let i = index" [ngClass]="{'carousel-item': true, 'active': i === 0}">
+              <img [src]="recipe.image" class="d-block w-100" [alt]="recipe.title">
+              <div class="carousel-caption d-none d-md-block">
+                <h5>{{ recipe.title }}</h5>
+              </div>
+            </div>
+          </div>
+          <a class="carousel-control-prev" href="#italianCarousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+          </a>
+          <a class="carousel-control-next" href="#italianCarousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+          </a>
         </div>
       </div>
     </section>
 
     <section class="call-to-action">
       <div class="container">
-        <h2>Create Your Custom Recipe</h2>
+        <h2>Choose The Ingredients For a Custom Recipe</h2>
         <a routerLink="/custom-search" class="btn btn-primary">Get Started</a>
       </div>
     </section>
@@ -73,6 +108,16 @@ import { NavbarComponent } from '../navbar/navbar.component';
     NavbarComponent
   ]
 })
-export class HomeComponent {
-  featuredRecipes = []; // Populate with data from your service
+export class HomeComponent implements OnInit {
+  featuredRecipes: any[] = [];
+  chineseRecipes: any[] = [];
+  italianRecipes: any[] = [];
+
+  constructor(private recipeService: RecipeService) {}
+
+  ngOnInit(): void {
+    this.recipeService.getFeaturedRecipes().subscribe(recipes => this.featuredRecipes = recipes);
+    this.recipeService.getChineseRecipes().subscribe(recipes => this.chineseRecipes = recipes);
+    this.recipeService.getItalianRecipes().subscribe(recipes => this.italianRecipes = recipes);
+  }
 }

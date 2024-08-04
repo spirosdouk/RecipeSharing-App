@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { take, filter } from 'rxjs/operators';
 
 @Component({
   standalone: true,
@@ -39,7 +40,6 @@ export class CustomSearchComponent implements OnInit {
   loading$: Observable<boolean>;
   error$: Observable<string | null>;
   query: string = 'pasta';
-  cuisine: string = '';
   intolerances: string[] = [];
   offset: number = 0;
   limit: number = 10;
@@ -85,11 +85,12 @@ export class CustomSearchComponent implements OnInit {
   }
 
   onScroll(): void {
-    this.loading$.subscribe(isLoading => {
-      if (!isLoading) {
-        this.offset += this.limit;
-        this.recipeService.fetchMoreRecipes(this.query, this.offset, this.limit, this.cuisine, this.intolerances);
-      }
+    this.loading$.pipe(
+      take(1),
+      filter(isLoading => !isLoading)
+    ).subscribe(() => {
+      this.offset += this.limit;
+      this.recipeService.fetchMoreRecipes(this.query, this.offset, this.limit, this.cuisine, this.intolerances);
     });
   }
 }
