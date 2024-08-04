@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
       </label>
     </div>
   `,
+  styleUrls: ['./intolerance-filter.component.css'],
   imports: [CommonModule, FormsModule],
 })
 export class IntoleranceFilterComponent {

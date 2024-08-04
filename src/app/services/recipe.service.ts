@@ -52,7 +52,12 @@ export class RecipeService {
       finalize(() => this.loadingSubject.next(false))
     ).subscribe(
       (recipes) => {
-        this.recipesSubject.next(recipes);
+        if (offset === 0) {
+          this.recipesSubject.next(recipes);  // Overwrite on initial load
+        } else {
+          const currentRecipes = this.recipesSubject.value;
+          this.recipesSubject.next([...currentRecipes, ...recipes]);  // Append on scroll
+        }
       },
       (error) => {
         this.errorSubject.next(error.message);
@@ -61,46 +66,7 @@ export class RecipeService {
   }
 
   fetchMoreRecipes(query: string, offset: number, number: number, cuisine?: string, intolerances?: string[]): void {
-    if (this.loadingSubject.value) {
-      return;
-    }
-
-    let params = new HttpParams()
-      .set('apiKey', this.apiKey)
-      .set('query', query)
-      .set('offset', offset.toString())
-      .set('number', number.toString());
-
-    if (cuisine) {
-      params = params.set('cuisine', cuisine);
-    }
-
-    if (intolerances && intolerances.length) {
-      params = params.set('intolerances', intolerances.join(','));
-    }
-
-    this.loadingSubject.next(true);
-    this.errorSubject.next(null);
-
-    this.http.get(this.apiUrl, { params }).pipe(
-      map((response: any) => {
-        console.log('API Response:', response);
-        return response.results.map((recipe: any) => ({
-          ...recipe,
-          image: `https://spoonacular.com/recipeImages/${recipe.id}-636x393.jpg`,
-          sourceUrl: `https://spoonacular.com/recipes/${recipe.title.replace(/ /g, '-')}-${recipe.id}`
-        }));
-      }),
-      finalize(() => this.loadingSubject.next(false))
-    ).subscribe(
-      (recipes) => {
-        const currentRecipes = this.recipesSubject.value;
-        this.recipesSubject.next([...currentRecipes, ...recipes]);
-      },
-      (error) => {
-        this.errorSubject.next(error.message);
-      }
-    );
+    this.getRecipes(query, offset, number, cuisine, intolerances);
   }
 
   getRecipesByIngredients(ingredients: string): void {

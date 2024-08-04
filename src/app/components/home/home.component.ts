@@ -1,81 +1,78 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
-import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
-import { MatDialogModule } from '@angular/material/dialog';
-import { NavbarComponent } from '../navbar/navbar.component';
 import { SearchBarComponent } from '../search-bar/search-bar.component';
 import { RecipeListComponent } from '../recipe-list/recipe-list.component';
-import { SearchService } from '../../services/search.service';
-import { RecipeService } from '../../services/recipe.service';
-import { Observable } from 'rxjs';
+import { MatDialogModule } from '@angular/material/dialog';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 @Component({
   standalone: true,
   selector: 'app-home',
   template: `
     <app-navbar></app-navbar>
-    <main class="content container mt-3">
-      <app-search-bar></app-search-bar>
-      <div infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollUpDistance]="1.5"
-        [infiniteScrollThrottle]="150" (scrolled)="onScroll()">
-        <ng-container *ngIf="recipes$ | async as recipes; else noRecipes">
-          <app-recipe-list [recipes]="recipes"></app-recipe-list>
-        </ng-container>
-        <ng-template #noRecipes>
-          <p>No recipes found.</p>
-        </ng-template>
+
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Welcome to Recipe Hub</h1>
+        <p>Your one-stop destination for delicious recipes.</p>
       </div>
-      <div *ngIf="error$ | async as errorMessage" class="alert alert-danger mt-3">
-        {{ errorMessage }}
+    </section>
+
+    <section class="featured-recipes">
+      <div class="container">
+        <h2>Featured Recipes</h2>
+        <app-recipe-list [recipes]="featuredRecipes"></app-recipe-list>
       </div>
-    </main>
+    </section>
+
+    <section class="categories">
+      <div class="container">
+        <h2>Popular Categories</h2>
+        <div class="category-buttons">
+          <button>Breakfast</button>
+          <button>Lunch</button>
+          <button>Dinner</button>
+          <button>Desserts</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="call-to-action">
+      <div class="container">
+        <h2>Create Your Custom Recipe</h2>
+        <a routerLink="/custom-search" class="btn btn-primary">Get Started</a>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container footer-content">
+        <nav>
+          <a routerLink="/privacy">Privacy Policy</a>
+          <a routerLink="/terms">Terms of Service</a>
+        </nav>
+        <div class="social-media">
+          <a href="#">Facebook</a>
+          <a href="#">Twitter</a>
+          <a href="#">Instagram</a>
+        </div>
+      </div>
+    </footer>
   `,
+  styleUrls: ['./home.component.css'],
   imports: [
     CommonModule,
     FormsModule,
     HttpClientModule,
     RouterModule,
-    InfiniteScrollDirective,
     MatDialogModule,
-    NavbarComponent,
     SearchBarComponent,
-    RecipeListComponent
+    RecipeListComponent,
+    NavbarComponent
   ]
 })
-export class HomeComponent implements OnInit {
-  recipes$: Observable<any[]>;
-  loading$: Observable<boolean>;
-  error$: Observable<string | null>;
-  query: string = 'pasta';
-  cuisine: string = '';
-  intolerances: string[] = [];
-  offset: number = 0;
-  limit: number = 10;
-
-  constructor(
-    private recipeService: RecipeService,
-    private searchService: SearchService
-  ) {
-    this.recipes$ = this.recipeService.recipes$;
-    this.loading$ = this.recipeService.loading$;
-    this.error$ = this.recipeService.error$;
-  }
-
-  ngOnInit(): void {
-    this.searchService.searchEvent$.subscribe(searchParams => {
-      this.recipeService.getRecipes(searchParams.query, this.offset, this.limit, searchParams.cuisine, searchParams.intolerances);
-    });
-
-    this.recipeService.getRecipes(this.query, this.offset, this.limit, this.cuisine, this.intolerances);
-  }
-
-  onScroll(): void {
-    if (!this.loading$) {
-      this.offset += this.limit;
-      this.recipeService.fetchMoreRecipes(this.query, this.offset, this.limit, this.cuisine, this.intolerances);
-    }
-  }
+export class HomeComponent {
+  featuredRecipes = []; // Populate with data from your service
 }

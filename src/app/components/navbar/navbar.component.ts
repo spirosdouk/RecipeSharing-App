@@ -30,7 +30,7 @@ import { SearchService } from '../../services/search.service';
           <ul class="navbar-nav">
             <li class="nav-item">
               <a class="nav-link" href="#">
-              <img src="user.png" alt="User" class="rounded-circle" width="30">
+              <img src="user.png" alt="User" class="rounded-circle" width="50">
               </a>
             </li>
           </ul>

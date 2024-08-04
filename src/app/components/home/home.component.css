@@ -1,0 +1,141 @@
+/* HomeComponent Styles */
+
+header {
+    background-color: #f8f9fa;
+    padding: 1rem 0;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo {
+    max-width: 150px;
+  }
+  
+  nav {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  nav a {
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  nav a:hover {
+    color: #007bff;
+  }
+  
+  .hero {
+    background: url('/assets/hero-image.jpg') no-repeat center center;
+    background-size: cover;
+    padding: 5rem 1rem;
+    color: white;
+    text-align: center;
+  }
+  
+  .hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .hero-content h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  .hero-content p {
+    font-size: 1.5rem;
+  }
+  
+  .featured-recipes {
+    padding: 2rem 0;
+  }
+  
+  .featured-recipes h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .categories {
+    padding: 2rem 0;
+    background-color: #f8f9fa;
+  }
+  
+  .categories h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .category-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  .category-buttons button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .category-buttons button:hover {
+    background-color: #0056b3;
+  }
+  
+  .call-to-action {
+    padding: 2rem 0;
+    text-align: center;
+  }
+  
+  .call-to-action h2 {
+    margin-bottom: 1rem;
+  }
+  
+  .footer-content {
+    background-color: #343a40;
+    color: white;
+    padding: 2rem 1rem;
+  }
+  
+  .footer-content nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .footer-content nav a {
+    color: #ddd;
+    text-decoration: none;
+  }
+  
+  .footer-content nav a:hover {
+    color: white;
+  }
+  
+  .footer-content .social-media {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  .footer-content .social-media a {
+    color: #ddd;
+    text-decoration: none;
+    font-size: 1.5rem;
+  }
+  
+  .footer-content .social-media a:hover {
+    color: white;
+  }
+  

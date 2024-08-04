@@ -7,28 +7,55 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   selector: 'app-filter-dialog',
   template: `
-    <h1 mat-dialog-title>Filters</h1>
-    <div mat-dialog-content>
-      <div>
-        <label for="cuisine">Cuisine:</label>
-        <select id="cuisine" [(ngModel)]="data.cuisine" class="form-control">
-          <option value="">All</option>
-          <option *ngFor="let cuisine of cuisines" [value]="cuisine">{{ cuisine }}</option>
-        </select>
-      </div>
-      <div>
-        <label *ngFor="let intolerance of intolerances" class="form-check-label">
-          <input type="checkbox" class="form-check-input" [value]="intolerance" (change)="onIntoleranceChange($event)">
-          {{ intolerance }}
-        </label>
+    <h1>Filters</h1>
+    <div>
+      <label for="cuisine">Cuisine:</label>
+      <select id="cuisine" [(ngModel)]="data.cuisine" class="form-control">
+        <option value="">All</option>
+        <option *ngFor="let cuisine of cuisines" [value]="cuisine">{{ cuisine }}</option>
+      </select>
+    </div>
+    <div>
+      <h3>Exclude Intolerances:</h3>
+      <div class="intolerances-grid">
+        <div *ngFor="let intolerance of intolerances">
+          <label>
+            <input type="checkbox" [value]="intolerance" (change)="onIntoleranceChange($event)">
+            {{ intolerance }}
+          </label>
+        </div>
       </div>
     </div>
-    <div mat-dialog-actions>
-      <button mat-button (click)="onCancel()">Cancel</button>
-      <button mat-button (click)="onApply()">Apply</button>
+    <div>
+      <button class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+      <button class="btn btn-primary" (click)="onApply()">Apply</button>
     </div>
   `,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule],
+  styles: [`
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    div {
+      margin-bottom: 1rem;
+    }
+    .intolerances-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+    label {
+      display: block;
+      margin: 0.5rem 0;
+    }
+    button {
+      margin-right: 1rem;
+    }
+    .btn {
+      margin-top: 1rem;
+    }
+  `]
 })
 export class FilterDialogComponent {
   cuisines: string[] = [

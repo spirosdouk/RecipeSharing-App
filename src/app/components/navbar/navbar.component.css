@@ -6,6 +6,8 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
+    width: 100%;
+
   }
   
   .navbar-nav {
@@ -18,8 +20,8 @@
   }
   
   .navbar-nav .nav-item .nav-link img {
-    max-width: 50px;
-    border-radius: 70%;
+    max-width: 100px;
+    border-radius: 100%;
   }
   
   .container-fluid {
@@ -27,3 +29,7 @@
     padding-right: 200px;
   }
   
+  .search-bar-container {
+    flex-grow: 1;
+    margin: 0 15px;
+  }
