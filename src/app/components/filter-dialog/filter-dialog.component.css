@@ -1,10 +1,42 @@
+.modal-content {
+  padding: 1rem;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #dee2e6;
+}
+
 .modal-body {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  
-  .form-check {
-    margin-bottom: 10px;
-  }
-  
+  flex-direction: column;
+  gap: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.intolerance-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.form-check-inline {
+  flex: 1 1 30%;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #dee2e6;
+}
+
+.custom-modal-footer {
+  padding: 1rem;
+}

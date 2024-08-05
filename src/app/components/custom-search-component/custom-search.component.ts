@@ -3,24 +3,28 @@ import { MatDialog } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { RecipeService } from '../../services/recipe.service';
 import { SearchService } from '../../services/search.service';
-import { IngredientInputComponent } from '../ingredient-input-component/ingredient-input.component';
 import { RecipeListComponent } from '../recipe-list/recipe-list.component';
 import { FilterDialogComponent } from '../filter-dialog/filter-dialog.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { NavbarComponent } from '../navbar/navbar.component';
-import { take, filter } from 'rxjs/operators';
 
 @Component({
   standalone: true,
   selector: 'app-custom-search',
   template: `
     <app-navbar></app-navbar>
-    <div class="container mt-3">
-      <h1>Custom Search</h1>
-      <button mat-button (click)="openFilterDialog()">Filters</button>
-      <app-ingredient-input (search)="onIngredientSearch($event)"></app-ingredient-input>
+
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Find Your Perfect Recipe</h1>
+        <p>Use our advanced filters to find the recipes that suit your taste and dietary needs.</p>
+        <button class="btn btn-primary" (click)="openFilterDialog()">Apply Filters</button>
+      </div>
+    </section>
+
+    <main class="content container mt-3">
       <div infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollUpDistance]="1.5"
         [infiniteScrollThrottle]="150" (scrolled)="onScroll()">
         <ng-container *ngIf="recipes$ | async as recipes; else noRecipes">
@@ -30,10 +34,13 @@ import { take, filter } from 'rxjs/operators';
           <p>No recipes found.</p>
         </ng-template>
       </div>
-      <div *ngIf="error$ | async as errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
-    </div>
+      <div *ngIf="error$ | async as errorMessage" class="alert alert-danger mt-3">
+        {{ errorMessage }}
+      </div>
+    </main>
   `,
-  imports: [CommonModule, FormsModule, IngredientInputComponent, RecipeListComponent, InfiniteScrollDirective, NavbarComponent],
+  styleUrls: ['./custom-search.component.css'],
+  imports: [CommonModule, FormsModule, RecipeListComponent, InfiniteScrollDirective, NavbarComponent],
 })
 export class CustomSearchComponent implements OnInit {
   recipes$: Observable<any[]>;
@@ -63,20 +70,23 @@ export class CustomSearchComponent implements OnInit {
     this.recipeService.getRecipes(this.query, this.offset, this.limit, this.cuisine, this.intolerances);
   }
 
-  onIngredientSearch(ingredients: string): void {
-    this.query = ingredients;
-    this.offset = 0;
-    this.recipeService.getRecipesByIngredients(ingredients);
-  }
-
   openFilterDialog(): void {
     const dialogRef = this.dialog.open(FilterDialogComponent, {
-      width: '300px',
-      data: { cuisine: this.cuisine, selectedIntolerances: this.intolerances }
+      width: '500px',
+      data: { 
+        ingredient1: this.query.split(',')[0] || '',
+        ingredient2: this.query.split(',')[1] || '',
+        ingredient3: this.query.split(',')[2] || '',
+        cuisine: this.cuisine,
+        selectedIntolerances: this.intolerances
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        this.query = [result.ingredient1, result.ingredient2, result.ingredient3]
+          .filter(ingredient => ingredient.trim() !== '')
+          .join(',');
         this.cuisine = result.cuisine;
         this.intolerances = result.selectedIntolerances;
         this.offset = 0;
@@ -86,12 +96,11 @@ export class CustomSearchComponent implements OnInit {
   }
 
   onScroll(): void {
-    this.loading$.pipe(
-      take(1),
-      filter(isLoading => !isLoading)
-    ).subscribe(() => {
-      this.offset += this.limit;
-      this.recipeService.fetchMoreRecipes(this.query, this.offset, this.limit, this.cuisine, this.intolerances);
+    this.loading$.subscribe(isLoading => {
+      if (!isLoading) {
+        this.offset += this.limit;
+        this.recipeService.fetchMoreRecipes(this.query, this.offset, this.limit, this.cuisine, this.intolerances);
+      }
     });
   }
 }

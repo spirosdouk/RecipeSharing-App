@@ -7,55 +7,47 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   selector: 'app-filter-dialog',
   template: `
-    <h1>Filters</h1>
-    <div>
-      <label for="cuisine">Cuisine:</label>
-      <select id="cuisine" [(ngModel)]="data.cuisine" class="form-control">
-        <option value="">All</option>
-        <option *ngFor="let cuisine of cuisines" [value]="cuisine">{{ cuisine }}</option>
-      </select>
-    </div>
-    <div>
-      <h3>Exclude Intolerances:</h3>
-      <div class="intolerances-grid">
-        <div *ngFor="let intolerance of intolerances">
-          <label>
-            <input type="checkbox" [value]="intolerance" (change)="onIntoleranceChange($event)">
-            {{ intolerance }}
-          </label>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Filters and Ingredients</h5>
+          <button type="button" class="close" (click)="onCancel()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="ingredient1">Enter Main Ingredients:</label>
+            <input [(ngModel)]="data.ingredient1" id="ingredient1" placeholder="Ingredient 1" class="form-control mb-2">
+            <input [(ngModel)]="data.ingredient2" id="ingredient2" placeholder="Ingredient 2" class="form-control mb-2">
+            <input [(ngModel)]="data.ingredient3" id="ingredient3" placeholder="Ingredient 3" class="form-control mb-2">
+          </div>
+          <div class="form-group">
+            <label for="cuisine">Cuisine:</label>
+            <select id="cuisine" [(ngModel)]="data.cuisine" class="form-control">
+              <option value="">All</option>
+              <option *ngFor="let cuisine of cuisines" [value]="cuisine">{{ cuisine }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Exclude Intolerances:</label>
+            <div class="intolerance-checkboxes">
+              <div *ngFor="let intolerance of intolerances" class="form-check form-check-inline">
+                <input type="checkbox" class="form-check-input" [value]="intolerance" (change)="onIntoleranceChange($event)">
+                <label class="form-check-label">{{ intolerance }}</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer custom-modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+          <button type="button" class="btn btn-primary" (click)="onApply()">Apply</button>
         </div>
       </div>
     </div>
-    <div>
-      <button class="btn btn-secondary" (click)="onCancel()">Cancel</button>
-      <button class="btn btn-primary" (click)="onApply()">Apply</button>
-    </div>
   `,
-  imports: [CommonModule, FormsModule],
-  styles: [`
-    h1 {
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-    div {
-      margin-bottom: 1rem;
-    }
-    .intolerances-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.5rem;
-    }
-    label {
-      display: block;
-      margin: 0.5rem 0;
-    }
-    button {
-      margin-right: 1rem;
-    }
-    .btn {
-      margin-top: 1rem;
-    }
-  `]
+  styleUrls: ['./filter-dialog.component.css'],
+  imports: [CommonModule, FormsModule]
 })
 export class FilterDialogComponent {
   cuisines: string[] = [
@@ -72,7 +64,7 @@ export class FilterDialogComponent {
 
   constructor(
     public dialogRef: MatDialogRef<FilterDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { cuisine: string, selectedIntolerances: string[] }
+    @Inject(MAT_DIALOG_DATA) public data: { ingredient1: string, ingredient2: string, ingredient3: string, cuisine: string, selectedIntolerances: string[] }
   ) {}
 
   onIntoleranceChange(event: any): void {
