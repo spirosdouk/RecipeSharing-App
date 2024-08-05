@@ -40,6 +40,7 @@ export class CustomSearchComponent implements OnInit {
   loading$: Observable<boolean>;
   error$: Observable<string | null>;
   query: string = 'pasta';
+  cuisine: string = '';
   intolerances: string[] = [];
   offset: number = 0;
   limit: number = 10;

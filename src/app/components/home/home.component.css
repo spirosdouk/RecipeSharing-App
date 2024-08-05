@@ -30,10 +30,9 @@ nav a:hover {
 }
 
 .hero {
-  background: url('/assets/hero-image.jpg') no-repeat center center;
+  background: url('/hero-image.jpg') no-repeat center center;
   background-size: cover;
   padding: 5rem 1rem;
-  color: white;
   text-align: center;
 }
 

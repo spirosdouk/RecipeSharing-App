@@ -123,7 +123,11 @@ export class RecipeService {
     return this.getRecipesByCuisine('Italian');
   }
 
+  getGreekRecipes(): Observable<any[]> {
+    return this.getRecipesByCuisine('Greek');
+  }
+
   getFeaturedRecipes(): Observable<any[]> {
-    return this.getRecipesByCuisine('', 10);
+    return this.getRecipesByCuisine('', 8);
   }
 }
