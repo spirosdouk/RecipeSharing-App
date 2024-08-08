@@ -21,7 +21,7 @@ import { SearchService } from '../../services/search.service';
               <a class="nav-link" routerLink="/custom-search">Custom Searching</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">My Recipes</a>
+             <a class="nav-link" routerLink="/my-recipes">My Recipes</a>
             </li>
           </ul>
           <div class="search-bar-container">

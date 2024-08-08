@@ -27,7 +27,7 @@ import { RecipeService } from '../../services/recipe.service';
         <app-recipe-list [recipes]="featuredRecipes"></app-recipe-list>
       </div>
     </section>
-
+<!-- 
     <section class="categories">
       <div class="container">
         <h2>Popular Categories</h2>
@@ -92,7 +92,7 @@ import { RecipeService } from '../../services/recipe.service';
           </a>
         </div>
       </div>
-   </section>
+   </section> -->
 
     <section class="call-to-action">
       <div class="container">
@@ -136,9 +136,21 @@ export class HomeComponent implements OnInit {
   constructor(private recipeService: RecipeService) {}
 
   ngOnInit(): void {
-    this.recipeService.getFeaturedRecipes().subscribe(recipes => this.featuredRecipes = recipes);
-    this.recipeService.getChineseRecipes().subscribe(recipes => this.chineseRecipes = recipes);
-    this.recipeService.getItalianRecipes().subscribe(recipes => this.italianRecipes = recipes);
-    this.recipeService.getGreekRecipes().subscribe(recipes => this.greekRecipes = recipes);
+    this.recipeService.getFeaturedRecipes().subscribe(recipes => {
+      this.featuredRecipes = recipes;
+      this.recipeService.updateRecipeSavedState(this.featuredRecipes);
+    });
+    this.recipeService.getChineseRecipes().subscribe(recipes => {
+      this.chineseRecipes = recipes;
+      this.recipeService.updateRecipeSavedState(this.chineseRecipes);
+    });
+    this.recipeService.getItalianRecipes().subscribe(recipes => {
+      this.italianRecipes = recipes;
+      this.recipeService.updateRecipeSavedState(this.italianRecipes);
+    });
+    this.recipeService.getGreekRecipes().subscribe(recipes => {
+      this.greekRecipes = recipes;
+      this.recipeService.updateRecipeSavedState(this.greekRecipes);
+    });
   }
 }

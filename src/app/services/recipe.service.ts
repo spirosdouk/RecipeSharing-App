@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map, finalize } from 'rxjs/operators';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +15,8 @@ export class RecipeService {
   private errorSubject = new BehaviorSubject<string | null>(null);
   error$: Observable<string | null> = this.errorSubject.asObservable();
 
-  private apiUrl = 'https://api.spoonacular.com/recipes/complexSearch';
-  private apiKey = '5c3a715f75f04c1994f4ddb09646159e';
+  private apiUrl = environment.apiUrl;
+  private apiKey = environment.apiKey;
   private noMoreRecipesSubject = new BehaviorSubject<boolean>(false);
   noMoreRecipes$ = this.noMoreRecipesSubject.asObservable();
 
@@ -30,7 +31,8 @@ export class RecipeService {
       .set('apiKey', this.apiKey)
       .set('query', query)
       .set('offset', offset.toString())
-      .set('number', number.toString());
+      .set('number', number.toString())
+      .set('addRecipeInformation', 'true');
 
     if (cuisine) {
       params = params.set('cuisine', cuisine);
@@ -71,15 +73,13 @@ export class RecipeService {
     });
   }
   
-  // fetchMoreRecipes(query: string, offset: number, number: number, cuisine?: string, intolerances?: string[]): void {
-  //   this.getRecipes(query, offset, number, cuisine, intolerances);
-  // }
   fetchMoreRecipes(query: string, offset: number, number: number, cuisine?: string, intolerances?: string[]): Observable<any> {
     let params = new HttpParams()
       .set('apiKey', this.apiKey)
       .set('query', query)
       .set('offset', offset.toString())
-      .set('number', number.toString());
+      .set('number', number.toString())
+      .set('addRecipeInformation', 'true');
 
     if (cuisine) {
       params = params.set('cuisine', cuisine);
@@ -120,7 +120,8 @@ export class RecipeService {
     let params = new HttpParams()
       .set('apiKey', this.apiKey)
       .set('includeIngredients', ingredients)
-      .set('number', '10');
+      .set('number', '10')
+      .set('addRecipeInformation', 'true');
 
     this.loadingSubject.next(true);
     this.errorSubject.next(null);
@@ -148,7 +149,8 @@ export class RecipeService {
     let params = new HttpParams()
       .set('apiKey', this.apiKey)
       .set('cuisine', cuisine)
-      .set('number', number.toString());
+      .set('number', number.toString())
+      .set('addRecipeInformation', 'true');
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => response.results.map((recipe: any) => ({
@@ -172,6 +174,39 @@ export class RecipeService {
   }
 
   getFeaturedRecipes(): Observable<any[]> {
-    return this.getRecipesByCuisine('', 8);
+    return this.getRecipesByCuisine('', 9);
+  }
+
+  private localStorageKey = 'savedRecipes';
+
+  saveRecipe(recipe: any): void {
+    const savedRecipes = this.getSavedRecipesFromLocalStorage();
+    if (!savedRecipes.find(savedRecipe => savedRecipe.id === recipe.id)) {
+      savedRecipes.push(recipe);
+      localStorage.setItem(this.localStorageKey, JSON.stringify(savedRecipes));
+      console.log('Recipe saved successfully!');
+    }
+  }
+
+  unsaveRecipe(recipeId: string): void {
+    const savedRecipes = this.getSavedRecipesFromLocalStorage().filter(recipe => recipe.id !== recipeId);
+    localStorage.setItem(this.localStorageKey, JSON.stringify(savedRecipes));
+    console.log('Recipe unsaved successfully!');
+  }
+
+  getSavedRecipes(): any[] {
+    return this.getSavedRecipesFromLocalStorage();
+  }
+
+  private getSavedRecipesFromLocalStorage(): any[] {
+    const savedRecipes = localStorage.getItem(this.localStorageKey);
+    return savedRecipes ? JSON.parse(savedRecipes) : [];
+  }
+
+  updateRecipeSavedState(recipes: any[]): void {
+    const savedRecipes = this.getSavedRecipesFromLocalStorage();
+    recipes.forEach(recipe => {
+      recipe.saved = savedRecipes.some(savedRecipe => savedRecipe.id === recipe.id);
+    });
   }
 }
