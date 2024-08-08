@@ -28,7 +28,7 @@ import { RecipeService } from '../../services/recipe.service';
       </div>
     </section>
 
-    <!-- <section class="categories">
+    <section class="categories">
       <div class="container">
         <h2>Popular Categories</h2>
 
@@ -92,7 +92,7 @@ import { RecipeService } from '../../services/recipe.service';
           </a>
         </div>
       </div>
-   </section> -->
+   </section>
 
     <section class="call-to-action">
       <div class="container">

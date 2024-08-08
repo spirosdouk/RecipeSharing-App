@@ -13,8 +13,11 @@ export class RecipeService {
   loading$: Observable<boolean> = this.loadingSubject.asObservable();
   private errorSubject = new BehaviorSubject<string | null>(null);
   error$: Observable<string | null> = this.errorSubject.asObservable();
+
   private apiUrl = 'https://api.spoonacular.com/recipes/complexSearch';
   private apiKey = '5c3a715f75f04c1994f4ddb09646159e';
+  private noMoreRecipesSubject = new BehaviorSubject<boolean>(false);
+  noMoreRecipes$ = this.noMoreRecipesSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -42,6 +45,9 @@ export class RecipeService {
 
     this.http.get(this.apiUrl, { params }).pipe(
       map((response: any) => {
+        if (response.results.length < number) {
+          this.noMoreRecipesSubject.next(true); // No more recipes available
+        }
         return response.results.map((recipe: any) => ({
           ...recipe,
           image: `https://spoonacular.com/recipeImages/${recipe.id}-636x393.jpg`,
@@ -49,8 +55,8 @@ export class RecipeService {
         }));
       }),
       finalize(() => this.loadingSubject.next(false))
-    ).subscribe(
-      (recipes) => {
+    ).subscribe({
+      next: (recipes) => {
         if (offset === 0) {
           this.recipesSubject.next(recipes);
         } else {
@@ -58,14 +64,52 @@ export class RecipeService {
           this.recipesSubject.next([...currentRecipes, ...recipes]);  // Append on scroll
         }
       },
-      (error) => {
+      error: (error) => {
+        this.noMoreRecipesSubject.next(true); // Stop fetching on error
         this.errorSubject.next(error.message);
       }
-    );
+    });
   }
+  
+  // fetchMoreRecipes(query: string, offset: number, number: number, cuisine?: string, intolerances?: string[]): void {
+  //   this.getRecipes(query, offset, number, cuisine, intolerances);
+  // }
+  fetchMoreRecipes(query: string, offset: number, number: number, cuisine?: string, intolerances?: string[]): Observable<any> {
+    let params = new HttpParams()
+      .set('apiKey', this.apiKey)
+      .set('query', query)
+      .set('offset', offset.toString())
+      .set('number', number.toString());
 
-  fetchMoreRecipes(query: string, offset: number, number: number, cuisine?: string, intolerances?: string[]): void {
-    this.getRecipes(query, offset, number, cuisine, intolerances);
+    if (cuisine) {
+      params = params.set('cuisine', cuisine);
+    }
+
+    if (intolerances && intolerances.length) {
+      params = params.set('intolerances', intolerances.join(','));
+    }
+
+    this.loadingSubject.next(true);
+    this.errorSubject.next(null);
+
+    return this.http.get(this.apiUrl, { params }).pipe(
+      map((response: any) => {
+        if (response.results.length < number) {
+          this.noMoreRecipesSubject.next(true); // No more recipes available
+        }
+        return response.results.map((recipe: any) => ({
+          ...recipe,
+          image: `https://spoonacular.com/recipeImages/${recipe.id}-636x393.jpg`,
+          sourceUrl: `https://spoonacular.com/recipes/${recipe.title.replace(/ /g, '-')}-${recipe.id}`
+        }));
+      }),
+      finalize(() => this.loadingSubject.next(false)),
+      map(recipes => {
+        const currentRecipes = this.recipesSubject.value;
+        this.recipesSubject.next([...currentRecipes, ...recipes]);
+        return recipes;
+      })
+    );
   }
 
   getRecipesByIngredients(ingredients: string): void {
@@ -90,14 +134,14 @@ export class RecipeService {
         }));
       }),
       finalize(() => this.loadingSubject.next(false))
-    ).subscribe(
-      (recipes) => {
+    ).subscribe({
+      next: (recipes) => {
         this.recipesSubject.next(recipes);
       },
-      (error) => {
+      error: (error) => {
         this.errorSubject.next(error.message);
       }
-    );
+    });
   }
 
   private getRecipesByCuisine(cuisine: string, number: number = 10): Observable<any[]> {

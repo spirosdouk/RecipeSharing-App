@@ -9,6 +9,7 @@ export class InfiniteScrollDirective {
   @HostListener('window:scroll', [])
   onScroll(): void {
     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+      console.log('Scrolled to the bottom');
       this.scrolled.emit();
     }
   }
