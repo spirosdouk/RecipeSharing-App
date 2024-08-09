@@ -121,28 +121,6 @@ export class CustomSearchComponent implements OnInit, OnDestroy {
       });
   }
 
-  // onScroll(): void {
-  //   console.log('Scrolled to the bottom of the page');
-  //   if (this.noMoreRecipes || this.fetching) {
-  //     console.log('No more recipes to fetch or already fetching');
-  //     return;
-  //   }
-
-  //   this.fetching = true;
-  //   this.loading$
-  //     .pipe(
-  //       debounceTime(200),
-  //       takeUntil(this.destroy$)
-  //     )
-  //     .subscribe(isLoading => {
-  //       if (!isLoading) {
-  //         console.log('Fetching more recipes');
-  //         this.offset += this.limit;
-  //         this.recipeService.fetchMoreRecipes(this.query, this.offset, this.limit, this.cuisine, this.intolerances);
-  //         this.fetching = false; // Reset fetching flag
-  //       }
-  //     });
-  // }
   onScroll(): void {
     console.log('Scrolled to the bottom of the page');
     if (this.noMoreRecipes || this.fetching) {

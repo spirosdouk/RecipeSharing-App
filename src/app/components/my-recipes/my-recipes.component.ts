@@ -9,7 +9,7 @@ import { NavbarComponent } from "../navbar/navbar.component";
   selector: 'app-my-recipes',
   template: `
     <app-navbar></app-navbar>
-    <div class="container my-5 bg-overlay">
+    <div class="container bg-overlay">
       <div class="text-center mb-5">
         <h2 class="display-4">My Saved Recipes</h2>
         <p class="lead">Here are the recipes you've saved. Enjoy your favorite dishes!</p>
@@ -19,11 +19,7 @@ import { NavbarComponent } from "../navbar/navbar.component";
   `,
   styles: [`
     .bg-overlay {
-      background: url('/hero-image.jpg') no-repeat center center;
-      background-size: cover;
-      padding: 10px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 30px;
       min-height: 400px;
       display: flex;
       flex-direction: column;
