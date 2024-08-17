@@ -2,6 +2,9 @@ import { Component, Output, EventEmitter } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { SearchBarComponent } from '../search-bar/search-bar.component';
 import { SearchService } from '../../services/search.service';
+import { CommonModule } from '@angular/common';
+import { LoginComponent } from '../login/login.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   standalone: true,
@@ -9,28 +12,48 @@ import { SearchService } from '../../services/search.service';
   template: `
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid container">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <a class="navbar-brand" href="#">
-            <img src="logo.png" alt="Tastebite" width="150">
+            <img src="logo.png" alt="Tastebite" width="150" />
           </a>
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link" routerLink="/custom-search">Custom Searching</a>
+              <a class="nav-link" routerLink="/custom-search"
+                >Custom Searching</a
+              >
             </li>
             <li class="nav-item">
-             <a class="nav-link" routerLink="/my-recipes">My Recipes</a>
+              <a class="nav-link" routerLink="/my-recipes">My Recipes</a>
             </li>
           </ul>
           <div class="search-bar-container">
             <app-search-bar (search)="onSearch($event)"></app-search-bar>
           </div>
           <ul class="navbar-nav">
-            <li class="nav-item">
+            <li class="nav-item" *ngIf="!isLoggedIn">
+              <a class="nav-link" href="#" (click)="openLoginDialog($event)"
+                >Login</a
+              >
+            </li>
+            <li id="nav-log" class="nav-item" *ngIf="isLoggedIn">
               <a class="nav-link" href="#">
-              <img src="user.png" alt="User" class="rounded-circle" width="50">
+                <img
+                  src="user.png"
+                  alt="User"
+                  class="rounded-circle"
+                  width="50"
+                />
               </a>
             </li>
           </ul>
@@ -38,15 +61,32 @@ import { SearchService } from '../../services/search.service';
       </div>
     </nav>
   `,
-  imports: [RouterModule, SearchBarComponent],
-  styleUrls: ['./navbar.component.css']
+  imports: [RouterModule, CommonModule, SearchBarComponent],
+  styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent {
-  @Output() search = new EventEmitter<{ query: string, cuisine: string, intolerances: string[] }>();
+  @Output() search = new EventEmitter<{
+    query: string;
+    cuisine: string;
+    intolerances: string[];
+  }>();
 
-  constructor(private searchService: SearchService) {}
+  isLoggedIn = false;
 
-  onSearch(searchParams: { query: string, cuisine: string, intolerances: string[] }) {
+  constructor(private searchService: SearchService, public dialog: MatDialog) {}
+
+  onSearch(searchParams: {
+    query: string;
+    cuisine: string;
+    intolerances: string[];
+  }) {
     this.searchService.emitSearchEvent(searchParams);
+  }
+
+  openLoginDialog(event: Event): void {
+    event.preventDefault();
+    this.dialog.open(LoginComponent, {
+      width: '400px',
+    });
   }
 }

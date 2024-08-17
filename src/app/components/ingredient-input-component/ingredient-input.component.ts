@@ -9,17 +9,30 @@ import { CommonModule } from '@angular/common';
     <div class="ingredient-input">
       <h3>Enter Main Ingredients</h3>
       <div class="form-group">
-        <input [(ngModel)]="ingredient1" placeholder="Ingredient 1" class="form-control mb-2">
-        <input [(ngModel)]="ingredient2" placeholder="Ingredient 2" class="form-control mb-2">
-        <input [(ngModel)]="ingredient3" placeholder="Ingredient 3" class="form-control mb-2">
+        <input
+          [(ngModel)]="ingredient1"
+          placeholder="Ingredient 1"
+          class="form-control mb-2"
+        />
+        <input
+          [(ngModel)]="ingredient2"
+          placeholder="Ingredient 2"
+          class="form-control mb-2"
+        />
+        <input
+          [(ngModel)]="ingredient3"
+          placeholder="Ingredient 3"
+          class="form-control mb-2"
+        />
       </div>
-      <button (click)="onSearch()" class="btn btn-primary">Search Recipes</button>
+      <button (click)="onSearch()" class="btn btn-primary">
+        Search Recipes
+      </button>
     </div>
   `,
   imports: [CommonModule, FormsModule],
-  //styleUrls: ['./ingredient-input.component.css']
 })
-export class IngredientInputComponent  {
+export class IngredientInputComponent {
   ingredient1: string = '';
   ingredient2: string = '';
   ingredient3: string = '';
@@ -27,7 +40,7 @@ export class IngredientInputComponent  {
 
   onSearch(): void {
     const ingredients = [this.ingredient1, this.ingredient2, this.ingredient3]
-      .filter(ingredient => ingredient.trim() !== '')
+      .filter((ingredient) => ingredient.trim() !== '')
       .join(',');
     this.search.emit(ingredients);
   }

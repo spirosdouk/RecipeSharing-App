@@ -1,2 +1,2 @@
-import 'zone.js'; // Already present
+import 'zone.js';
 import '@angular/localize/init';

@@ -10,7 +10,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
       <router-outlet></router-outlet>
     </main>
   `,
-  imports: [RouterModule, NavbarComponent]
+  imports: [RouterModule, NavbarComponent],
 })
 export class AppComponent {
   title = 'Recipes';

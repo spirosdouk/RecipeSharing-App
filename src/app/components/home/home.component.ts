@@ -21,7 +21,7 @@ import { RecipeService } from '../../services/recipe.service';
         <p>Your one-stop destination for delicious recipes.</p>
       </div>
     </section>
-    
+
     <section class="featured-recipes">
       <div class="container">
         <app-recipe-list [recipes]="featuredRecipes"></app-recipe-list>
@@ -29,77 +29,145 @@ import { RecipeService } from '../../services/recipe.service';
     </section>
 
     <section class="categories">
-  <div class="container">
-    <h2 class="mb-4">Popular Categories</h2>
+      <div class="container">
+        <h2 class="mb-4">Popular Categories</h2>
 
-    <div class="mb-4">
-      <h3 class="mb-3">Chinese Cuisine</h3>
-      <div id="chineseCarousel" class="carousel slide" data-ride="carousel">
-        <div class="carousel-inner">
-          <div *ngFor="let recipe of chineseRecipes; let i = index" [ngClass]="{'carousel-item': true, 'active': i === 0}">
-            <img [src]="recipe.image" class="d-block w-100" [alt]="recipe.title">
-            <div class="carousel-caption d-none d-md-block">
-              <h5>{{ recipe.title }}</h5>
+        <div class="mb-4">
+          <h3 class="mb-3">Chinese Cuisine</h3>
+          <div id="chineseCarousel" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+              <div
+                *ngFor="let recipe of chineseRecipes; let i = index"
+                [ngClass]="{ 'carousel-item': true, active: i === 0 }"
+              >
+                <img
+                  [src]="recipe.image"
+                  class="d-block w-100"
+                  [alt]="recipe.title"
+                />
+                <div class="carousel-caption d-none d-md-block">
+                  <h5>{{ recipe.title }}</h5>
+                </div>
+              </div>
             </div>
+            <a
+              class="carousel-control-prev"
+              href="#chineseCarousel"
+              role="button"
+              data-slide="prev"
+            >
+              <span
+                class="carousel-control-prev-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a
+              class="carousel-control-next"
+              href="#chineseCarousel"
+              role="button"
+              data-slide="next"
+            >
+              <span
+                class="carousel-control-next-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="sr-only">Next</span>
+            </a>
           </div>
         </div>
-        <a class="carousel-control-prev" href="#chineseCarousel" role="button" data-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="sr-only">Previous</span>
-        </a>
-        <a class="carousel-control-next" href="#chineseCarousel" role="button" data-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="sr-only">Next</span>
-        </a>
-      </div>
-    </div>
 
-    <div class="mb-4">
-      <h3 class="mb-3">Italian Cuisine</h3>
-      <div id="italianCarousel" class="carousel slide" data-ride="carousel">
-        <div class="carousel-inner">
-          <div *ngFor="let recipe of italianRecipes; let i = index" [ngClass]="{'carousel-item': true, 'active': i === 0}">
-            <img [src]="recipe.image" class="d-block w-100" [alt]="recipe.title">
-            <div class="carousel-caption d-none d-md-block">
-              <h5>{{ recipe.title }}</h5>
+        <div class="mb-4">
+          <h3 class="mb-3">Italian Cuisine</h3>
+          <div id="italianCarousel" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+              <div
+                *ngFor="let recipe of italianRecipes; let i = index"
+                [ngClass]="{ 'carousel-item': true, active: i === 0 }"
+              >
+                <img
+                  [src]="recipe.image"
+                  class="d-block w-100"
+                  [alt]="recipe.title"
+                />
+                <div class="carousel-caption d-none d-md-block">
+                  <h5>{{ recipe.title }}</h5>
+                </div>
+              </div>
             </div>
+            <a
+              class="carousel-control-prev"
+              href="#italianCarousel"
+              role="button"
+              data-slide="prev"
+            >
+              <span
+                class="carousel-control-prev-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a
+              class="carousel-control-next"
+              href="#italianCarousel"
+              role="button"
+              data-slide="next"
+            >
+              <span
+                class="carousel-control-next-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="sr-only">Next</span>
+            </a>
           </div>
         </div>
-        <a class="carousel-control-prev" href="#italianCarousel" role="button" data-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="sr-only">Previous</span>
-        </a>
-        <a class="carousel-control-next" href="#italianCarousel" role="button" data-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="sr-only">Next</span>
-        </a>
-      </div>
-    </div>
-    
-    <div class="mb-4">
-      <h3 class="mb-3">Greek Cuisine</h3>
-      <div id="greekCarousel" class="carousel slide" data-ride="carousel">
-        <div class="carousel-inner">
-          <div *ngFor="let recipe of greekRecipes; let i = index" [ngClass]="{'carousel-item': true, 'active': i === 0}">
-            <img [src]="recipe.image" class="d-block w-100" [alt]="recipe.title">
-            <div class="carousel-caption d-none d-md-block">
-              <h5>{{ recipe.title }}</h5>
+
+        <div class="mb-4">
+          <h3 class="mb-3">Greek Cuisine</h3>
+          <div id="greekCarousel" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+              <div
+                *ngFor="let recipe of greekRecipes; let i = index"
+                [ngClass]="{ 'carousel-item': true, active: i === 0 }"
+              >
+                <img
+                  [src]="recipe.image"
+                  class="d-block w-100"
+                  [alt]="recipe.title"
+                />
+                <div class="carousel-caption d-none d-md-block">
+                  <h5>{{ recipe.title }}</h5>
+                </div>
+              </div>
             </div>
+            <a
+              class="carousel-control-prev"
+              href="#greekCarousel"
+              role="button"
+              data-slide="prev"
+            >
+              <span
+                class="carousel-control-prev-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a
+              class="carousel-control-next"
+              href="#greekCarousel"
+              role="button"
+              data-slide="next"
+            >
+              <span
+                class="carousel-control-next-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="sr-only">Next</span>
+            </a>
           </div>
         </div>
-        <a class="carousel-control-prev" href="#greekCarousel" role="button" data-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="sr-only">Previous</span>
-        </a>
-        <a class="carousel-control-next" href="#greekCarousel" role="button" data-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="sr-only">Next</span>
-        </a>
       </div>
-    </div>
-
-  </div>
-</section>
+    </section>
 
     <section class="call-to-action">
       <div class="container">
@@ -131,8 +199,8 @@ import { RecipeService } from '../../services/recipe.service';
     MatDialogModule,
     SearchBarComponent,
     RecipeListComponent,
-    NavbarComponent
-  ]
+    NavbarComponent,
+  ],
 })
 export class HomeComponent implements OnInit {
   featuredRecipes: any[] = [];
@@ -143,19 +211,19 @@ export class HomeComponent implements OnInit {
   constructor(private recipeService: RecipeService) {}
 
   ngOnInit(): void {
-    this.recipeService.getFeaturedRecipes().subscribe(recipes => {
+    this.recipeService.getFeaturedRecipes().subscribe((recipes) => {
       this.featuredRecipes = recipes;
       this.recipeService.updateRecipeSavedState(this.featuredRecipes);
     });
-    this.recipeService.getChineseRecipes().subscribe(recipes => {
+    this.recipeService.getChineseRecipes().subscribe((recipes) => {
       this.chineseRecipes = recipes;
       this.recipeService.updateRecipeSavedState(this.chineseRecipes);
     });
-    this.recipeService.getItalianRecipes().subscribe(recipes => {
+    this.recipeService.getItalianRecipes().subscribe((recipes) => {
       this.italianRecipes = recipes;
       this.recipeService.updateRecipeSavedState(this.italianRecipes);
     });
-    this.recipeService.getGreekRecipes().subscribe(recipes => {
+    this.recipeService.getGreekRecipes().subscribe((recipes) => {
       this.greekRecipes = recipes;
       this.recipeService.updateRecipeSavedState(this.greekRecipes);
     });

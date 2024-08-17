@@ -1,6 +1,5 @@
 export const environment = {
-    production: true,
-    apiUrl: 'https://api.spoonacular.com/recipes/complexSearch',
-    apiKey: 'YOUR API KEY'
-  };
-  
+  production: true,
+  apiUrl: 'https://api.spoonacular.com/recipes/complexSearch',
+  apiKey: 'YOUR API KEY',
+};

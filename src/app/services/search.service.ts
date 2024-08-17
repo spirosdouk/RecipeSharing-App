@@ -2,17 +2,25 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SearchService {
-  private searchEventSource = new BehaviorSubject<{ query: string, cuisine: string, intolerances: string[] }>({
+  private searchEventSource = new BehaviorSubject<{
+    query: string;
+    cuisine: string;
+    intolerances: string[];
+  }>({
     query: 'pasta',
     cuisine: '',
-    intolerances: []
+    intolerances: [],
   });
   searchEvent$ = this.searchEventSource.asObservable();
 
-  emitSearchEvent(searchParams: { query: string, cuisine: string, intolerances: string[] }): void {
+  emitSearchEvent(searchParams: {
+    query: string;
+    cuisine: string;
+    intolerances: string[];
+  }): void {
     this.searchEventSource.next(searchParams);
   }
 }

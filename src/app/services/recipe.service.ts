@@ -5,7 +5,7 @@ import { map, finalize } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RecipeService {
   private recipesSubject = new BehaviorSubject<any[]>([]);
@@ -22,7 +22,13 @@ export class RecipeService {
 
   constructor(private http: HttpClient) {}
 
-  getRecipes(query: string, offset: number = 0, number: number = 10, cuisine?: string, intolerances?: string[]): void {
+  getRecipes(
+    query: string,
+    offset: number = 0,
+    number: number = 10,
+    cuisine?: string,
+    intolerances?: string[]
+  ): void {
     if (this.loadingSubject.value) {
       return;
     }
@@ -45,35 +51,47 @@ export class RecipeService {
     this.loadingSubject.next(true);
     this.errorSubject.next(null);
 
-    this.http.get(this.apiUrl, { params }).pipe(
-      map((response: any) => {
-        if (response.results.length < number) {
-          this.noMoreRecipesSubject.next(true); // No more recipes available
-        }
-        return response.results.map((recipe: any) => ({
-          ...recipe,
-          image: `https://spoonacular.com/recipeImages/${recipe.id}-636x393.jpg`,
-          sourceUrl: `https://spoonacular.com/recipes/${recipe.title.replace(/ /g, '-')}-${recipe.id}`
-        }));
-      }),
-      finalize(() => this.loadingSubject.next(false))
-    ).subscribe({
-      next: (recipes) => {
-        if (offset === 0) {
-          this.recipesSubject.next(recipes);
-        } else {
-          const currentRecipes = this.recipesSubject.value;
-          this.recipesSubject.next([...currentRecipes, ...recipes]);  // Append on scroll
-        }
-      },
-      error: (error) => {
-        this.noMoreRecipesSubject.next(true); // Stop fetching on error
-        this.errorSubject.next(error.message);
-      }
-    });
+    this.http
+      .get(this.apiUrl, { params })
+      .pipe(
+        map((response: any) => {
+          if (response.results.length < number) {
+            this.noMoreRecipesSubject.next(true); // No more recipes available
+          }
+          return response.results.map((recipe: any) => ({
+            ...recipe,
+            image: `https://spoonacular.com/recipeImages/${recipe.id}-636x393.jpg`,
+            sourceUrl: `https://spoonacular.com/recipes/${recipe.title.replace(
+              / /g,
+              '-'
+            )}-${recipe.id}`,
+          }));
+        }),
+        finalize(() => this.loadingSubject.next(false))
+      )
+      .subscribe({
+        next: (recipes) => {
+          if (offset === 0) {
+            this.recipesSubject.next(recipes);
+          } else {
+            const currentRecipes = this.recipesSubject.value;
+            this.recipesSubject.next([...currentRecipes, ...recipes]); // Append on scroll
+          }
+        },
+        error: (error) => {
+          this.noMoreRecipesSubject.next(true); // Stop fetching on error
+          this.errorSubject.next(error.message);
+        },
+      });
   }
-  
-  fetchMoreRecipes(query: string, offset: number, number: number, cuisine?: string, intolerances?: string[]): Observable<any> {
+
+  fetchMoreRecipes(
+    query: string,
+    offset: number,
+    number: number,
+    cuisine?: string,
+    intolerances?: string[]
+  ): Observable<any> {
     let params = new HttpParams()
       .set('apiKey', this.apiKey)
       .set('query', query)
@@ -100,11 +118,14 @@ export class RecipeService {
         return response.results.map((recipe: any) => ({
           ...recipe,
           image: `https://spoonacular.com/recipeImages/${recipe.id}-636x393.jpg`,
-          sourceUrl: `https://spoonacular.com/recipes/${recipe.title.replace(/ /g, '-')}-${recipe.id}`
+          sourceUrl: `https://spoonacular.com/recipes/${recipe.title.replace(
+            / /g,
+            '-'
+          )}-${recipe.id}`,
         }));
       }),
       finalize(() => this.loadingSubject.next(false)),
-      map(recipes => {
+      map((recipes) => {
         const currentRecipes = this.recipesSubject.value;
         this.recipesSubject.next([...currentRecipes, ...recipes]);
         return recipes;
@@ -126,26 +147,35 @@ export class RecipeService {
     this.loadingSubject.next(true);
     this.errorSubject.next(null);
 
-    this.http.get(this.apiUrl, { params }).pipe(
-      map((response: any) => {
-        return response.results.map((recipe: any) => ({
-          ...recipe,
-          image: `https://spoonacular.com/recipeImages/${recipe.id}-636x393.jpg`,
-          sourceUrl: `https://spoonacular.com/recipes/${recipe.title.replace(/ /g, '-')}-${recipe.id}`
-        }));
-      }),
-      finalize(() => this.loadingSubject.next(false))
-    ).subscribe({
-      next: (recipes) => {
-        this.recipesSubject.next(recipes);
-      },
-      error: (error) => {
-        this.errorSubject.next(error.message);
-      }
-    });
+    this.http
+      .get(this.apiUrl, { params })
+      .pipe(
+        map((response: any) => {
+          return response.results.map((recipe: any) => ({
+            ...recipe,
+            image: `https://spoonacular.com/recipeImages/${recipe.id}-636x393.jpg`,
+            sourceUrl: `https://spoonacular.com/recipes/${recipe.title.replace(
+              / /g,
+              '-'
+            )}-${recipe.id}`,
+          }));
+        }),
+        finalize(() => this.loadingSubject.next(false))
+      )
+      .subscribe({
+        next: (recipes) => {
+          this.recipesSubject.next(recipes);
+        },
+        error: (error) => {
+          this.errorSubject.next(error.message);
+        },
+      });
   }
 
-  private getRecipesByCuisine(cuisine: string, number: number = 10): Observable<any[]> {
+  private getRecipesByCuisine(
+    cuisine: string,
+    number: number = 10
+  ): Observable<any[]> {
     let params = new HttpParams()
       .set('apiKey', this.apiKey)
       .set('cuisine', cuisine)
@@ -153,11 +183,16 @@ export class RecipeService {
       .set('addRecipeInformation', 'true');
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
-      map(response => response.results.map((recipe: any) => ({
-        ...recipe,
-        image: `https://spoonacular.com/recipeImages/${recipe.id}-636x393.jpg`,
-        sourceUrl: `https://spoonacular.com/recipes/${recipe.title.replace(/ /g, '-')}-${recipe.id}`
-      })))
+      map((response) =>
+        response.results.map((recipe: any) => ({
+          ...recipe,
+          image: `https://spoonacular.com/recipeImages/${recipe.id}-636x393.jpg`,
+          sourceUrl: `https://spoonacular.com/recipes/${recipe.title.replace(
+            / /g,
+            '-'
+          )}-${recipe.id}`,
+        }))
+      )
     );
   }
 
@@ -181,7 +216,7 @@ export class RecipeService {
 
   saveRecipe(recipe: any): void {
     const savedRecipes = this.getSavedRecipesFromLocalStorage();
-    if (!savedRecipes.find(savedRecipe => savedRecipe.id === recipe.id)) {
+    if (!savedRecipes.find((savedRecipe) => savedRecipe.id === recipe.id)) {
       savedRecipes.push(recipe);
       localStorage.setItem(this.localStorageKey, JSON.stringify(savedRecipes));
       console.log('Recipe saved successfully!');
@@ -189,7 +224,9 @@ export class RecipeService {
   }
 
   unsaveRecipe(recipeId: string): void {
-    const savedRecipes = this.getSavedRecipesFromLocalStorage().filter(recipe => recipe.id !== recipeId);
+    const savedRecipes = this.getSavedRecipesFromLocalStorage().filter(
+      (recipe) => recipe.id !== recipeId
+    );
     localStorage.setItem(this.localStorageKey, JSON.stringify(savedRecipes));
     console.log('Recipe unsaved successfully!');
   }
@@ -205,8 +242,10 @@ export class RecipeService {
 
   updateRecipeSavedState(recipes: any[]): void {
     const savedRecipes = this.getSavedRecipesFromLocalStorage();
-    recipes.forEach(recipe => {
-      recipe.saved = savedRecipes.some(savedRecipe => savedRecipe.id === recipe.id);
+    recipes.forEach((recipe) => {
+      recipe.saved = savedRecipes.some(
+        (savedRecipe) => savedRecipe.id === recipe.id
+      );
     });
   }
 }

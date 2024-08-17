@@ -9,10 +9,18 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter([
       { path: '', component: HomeComponent, title: 'Home Page' },
-      { path: 'custom-search', component: CustomSearchComponent, title: 'Custom Search Page' },
-      { path: 'my-recipes', component: MyRecipesComponent, title: 'My Recipes' },
-      { path: '**', redirectTo: '', pathMatch: 'full' }
+      {
+        path: 'custom-search',
+        component: CustomSearchComponent,
+        title: 'Custom Search Page',
+      },
+      {
+        path: 'my-recipes',
+        component: MyRecipesComponent,
+        title: 'My Recipes',
+      },
+      { path: '**', redirectTo: '', pathMatch: 'full' },
     ]),
     provideHttpClient(),
-  ]
+  ],
 };
