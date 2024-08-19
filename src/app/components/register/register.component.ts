@@ -5,11 +5,11 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-register',
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <h2>Login</h2>
+    <h2>Register</h2>
     <form (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="email">Email:</label>
@@ -31,24 +31,24 @@ import { CommonModule } from '@angular/common';
           required
         />
       </div>
-      <button type="submit" class="btn btn-primary">Login</button>
+      <button type="submit" class="btn btn-primary">Register</button>
     </form>
   `,
-  styleUrls: ['./login.component.css'],
+  styleUrls: ['./register.component.css'],
 })
-export class LoginComponent {
+export class RegisterComponent {
   email: string = '';
   password: string = '';
 
   constructor(
     private http: HttpClient,
-    public dialogRef: MatDialogRef<LoginComponent>
+    public dialogRef: MatDialogRef<RegisterComponent>
   ) {}
 
   onSubmit(): void {
-    const loginData = { email: this.email, password: this.password };
+    const registerData = { email: this.email, password: this.password };
     this.http
-      .post('http://localhost:3000/api/auth/login', loginData)
+      .post('http://localhost:3000/api/auth/register', registerData)
       .subscribe({
         next: (response: any) => {
           console.log(response);

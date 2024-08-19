@@ -3,8 +3,8 @@ import { RouterModule } from '@angular/router';
 import { SearchBarComponent } from '../search-bar/search-bar.component';
 import { SearchService } from '../../services/search.service';
 import { CommonModule } from '@angular/common';
-import { LoginComponent } from '../login/login.component';
 import { MatDialog } from '@angular/material/dialog';
+import { AuthModalComponent } from '../login/auth-modal.component';
 
 @Component({
   standalone: true,
@@ -42,7 +42,7 @@ import { MatDialog } from '@angular/material/dialog';
           </div>
           <ul class="navbar-nav">
             <li class="nav-item" *ngIf="!isLoggedIn">
-              <a class="nav-link" href="#" (click)="openLoginDialog($event)"
+              <a class="nav-link" href="#" (click)="openAuthDialog($event)"
                 >Login</a
               >
             </li>
@@ -83,9 +83,9 @@ export class NavbarComponent {
     this.searchService.emitSearchEvent(searchParams);
   }
 
-  openLoginDialog(event: Event): void {
+  openAuthDialog(event: Event): void {
     event.preventDefault();
-    this.dialog.open(LoginComponent, {
+    this.dialog.open(AuthModalComponent, {
       width: '400px',
     });
   }
