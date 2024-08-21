@@ -4,7 +4,8 @@ import { SearchBarComponent } from '../search-bar/search-bar.component';
 import { SearchService } from '../../services/search.service';
 import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
-import { AuthModalComponent } from '../login/auth-modal.component';
+import { AuthModalComponent } from '../authentication/auth-modal.component';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   standalone: true,
@@ -46,8 +47,16 @@ import { AuthModalComponent } from '../login/auth-modal.component';
                 >Login</a
               >
             </li>
-            <li id="nav-log" class="nav-item" *ngIf="isLoggedIn">
-              <a class="nav-link" href="#">
+            <li id="nav-log" class="nav-item dropdown" *ngIf="isLoggedIn">
+              <a
+                class="nav-link"
+                href="#"
+                id="userDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                (click)="toggleDropdown()"
+              >
                 <img
                   src="user.png"
                   alt="User"
@@ -55,6 +64,17 @@ import { AuthModalComponent } from '../login/auth-modal.component';
                   width="50"
                 />
               </a>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="userDropdown"
+                [ngClass]="{ show: dropdownOpen }"
+              >
+                <li>
+                  <a class="dropdown-item" href="#" (click)="logout()"
+                    >Logout</a
+                  >
+                </li>
+              </ul>
             </li>
           </ul>
         </div>
@@ -72,8 +92,13 @@ export class NavbarComponent {
   }>();
 
   isLoggedIn = false;
+  dropdownOpen = false;
 
-  constructor(private searchService: SearchService, public dialog: MatDialog) {}
+  constructor(
+    private searchService: SearchService,
+    public dialog: MatDialog,
+    private authService: AuthService
+  ) {}
 
   onSearch(searchParams: {
     query: string;
@@ -81,6 +106,21 @@ export class NavbarComponent {
     intolerances: string[];
   }) {
     this.searchService.emitSearchEvent(searchParams);
+  }
+
+  ngOnInit(): void {
+    this.authService.isLoggedIn().subscribe((loggedIn) => {
+      this.isLoggedIn = loggedIn;
+    });
+  }
+
+  toggleDropdown(): void {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.dropdownOpen = false;
   }
 
   openAuthDialog(event: Event): void {

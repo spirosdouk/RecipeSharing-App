@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RecipeService } from '../../services/recipe.service';
 import { RecipeListComponent } from '../recipe-list/recipe-list.component';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   standalone: true,
@@ -45,9 +46,28 @@ import { NavbarComponent } from '../navbar/navbar.component';
 export class MyRecipesComponent implements OnInit {
   savedRecipes: any[] = [];
 
-  constructor(private recipeService: RecipeService) {}
+  constructor(
+    private recipeService: RecipeService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    this.savedRecipes = this.recipeService.getSavedRecipes();
+    const userIdString = this.authService.getUserId();
+    if (userIdString) {
+      const userId = Number(userIdString);
+      this.recipeService.getSavedRecipesForUser(userId).subscribe({
+        next: (recipes: any[]) => {
+          this.savedRecipes = recipes.map((recipe) => ({
+            ...recipe,
+            saved: true,
+          }));
+        },
+        error: (_err: any) => {
+          console.error('Error fetching saved recipes');
+        },
+      });
+    } else {
+      console.error('User is not logged in');
+    }
   }
 }

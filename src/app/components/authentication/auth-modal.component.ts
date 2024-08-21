@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-auth-modal',
@@ -52,6 +54,10 @@ import { CommonModule } from '@angular/common';
           {{ isLoginMode ? 'Sign up' : 'Login' }}
         </a>
       </p>
+
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
     </div>
   `,
   styleUrls: ['./auth-modal.component.css'],
@@ -60,14 +66,18 @@ export class AuthModalComponent {
   email: string = '';
   password: string = '';
   isLoginMode: boolean = true;
+  errorMessage: string = '';
 
   constructor(
     private http: HttpClient,
-    public dialogRef: MatDialogRef<AuthModalComponent>
+    public dialogRef: MatDialogRef<AuthModalComponent>,
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   toggleMode() {
     this.isLoginMode = !this.isLoginMode;
+    this.errorMessage = '';
   }
 
   onSubmit(): void {
@@ -78,35 +88,35 @@ export class AuthModalComponent {
     }
   }
 
-  login() {
+  login(): void {
     const loginData = { email: this.email, password: this.password };
-    this.http
-      .post('http://localhost:3000/api/auth/login', loginData)
-      .subscribe({
-        next: (response: any) => {
-          console.log(response);
-          localStorage.setItem('token', response.token);
-          this.dialogRef.close();
-        },
-        error: (error) => {
-          console.error(error);
-        },
-      });
+    this.http.post('/api/auth/login', loginData).subscribe({
+      next: (response: any) => {
+        const { token, userId } = response;
+        this.authService.login(token, userId);
+        this.dialogRef.close();
+        this.router.navigate(['/']);
+      },
+      error: (error) => {
+        console.error('Login failed', error);
+        this.errorMessage = 'Login failed. Please try again.';
+      },
+    });
   }
 
-  signup() {
+  signup(): void {
     const signupData = { email: this.email, password: this.password };
-    this.http
-      .post('http://localhost:3000/api/auth/register', signupData)
-      .subscribe({
-        next: (response: any) => {
-          console.log(response);
-          localStorage.setItem('token', response.token);
-          this.dialogRef.close();
-        },
-        error: (error) => {
-          console.error(error);
-        },
-      });
+    this.http.post('/api/auth/register', signupData).subscribe({
+      next: (response: any) => {
+        const { token, userId } = response;
+        this.authService.login(token, userId);
+        this.dialogRef.close();
+      },
+      error: (error) => {
+        console.error(error);
+        this.errorMessage =
+          error.error.message || 'Signup failed. Please try again.';
+      },
+    });
   }
 }

@@ -1,8 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { map, finalize } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
+import { map, finalize, catchError, switchMap } from 'rxjs/operators';
 import { environment } from '../environments/environment';
+import { AuthService } from './auth.service';
+
+interface Recipe {
+  id: number;
+  title: string;
+  image: string;
+  sourceUrl: string;
+  saved?: boolean;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -20,17 +29,19 @@ export class RecipeService {
   private noMoreRecipesSubject = new BehaviorSubject<boolean>(false);
   noMoreRecipes$ = this.noMoreRecipesSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   getRecipes(
     query: string,
     offset: number = 0,
     number: number = 10,
     cuisine?: string,
-    intolerances?: string[]
-  ): void {
+    intolerances: string[] = []
+  ): Observable<any[]> {
+    const userId = this.authService.getUserId();
+
     if (this.loadingSubject.value) {
-      return;
+      return of([]);
     }
 
     let params = new HttpParams()
@@ -44,45 +55,48 @@ export class RecipeService {
       params = params.set('cuisine', cuisine);
     }
 
-    if (intolerances && intolerances.length) {
+    if (intolerances.length > 0) {
       params = params.set('intolerances', intolerances.join(','));
     }
 
     this.loadingSubject.next(true);
     this.errorSubject.next(null);
 
-    this.http
-      .get(this.apiUrl, { params })
-      .pipe(
-        map((response: any) => {
-          if (response.results.length < number) {
-            this.noMoreRecipesSubject.next(true); // No more recipes available
-          }
-          return response.results.map((recipe: any) => ({
-            ...recipe,
-            image: `https://spoonacular.com/recipeImages/${recipe.id}-636x393.jpg`,
-            sourceUrl: `https://spoonacular.com/recipes/${recipe.title.replace(
-              / /g,
-              '-'
-            )}-${recipe.id}`,
-          }));
-        }),
-        finalize(() => this.loadingSubject.next(false))
-      )
-      .subscribe({
-        next: (recipes) => {
-          if (offset === 0) {
-            this.recipesSubject.next(recipes);
-          } else {
-            const currentRecipes = this.recipesSubject.value;
-            this.recipesSubject.next([...currentRecipes, ...recipes]); // Append on scroll
-          }
-        },
-        error: (error) => {
-          this.noMoreRecipesSubject.next(true); // Stop fetching on error
-          this.errorSubject.next(error.message);
-        },
-      });
+    return this.http.get<any[]>(this.apiUrl, { params }).pipe(
+      switchMap((recipesResponse: any) => {
+        const recipes = recipesResponse.results.map((recipe: any) => ({
+          ...recipe,
+          image: `https://spoonacular.com/recipeImages/${recipe.id}-636x393.jpg`,
+          sourceUrl: `https://spoonacular.com/recipes/${recipe.title.replace(
+            / /g,
+            '-'
+          )}-${recipe.id}`,
+        }));
+
+        if (userId) {
+          return this.http
+            .get<number[]>(`/api/recipes/saved-recipes?userId=${userId}`)
+            .pipe(
+              map((savedRecipeIds: number[]) => {
+                recipes.forEach((recipe: Recipe) => {
+                  recipe.saved = savedRecipeIds.includes(recipe.id);
+                });
+                return recipes;
+              })
+            );
+        } else {
+          return of(recipes);
+        }
+      }),
+      catchError((error) => {
+        console.error('Error fetching recipes:', error);
+        this.errorSubject.next(
+          'Failed to fetch recipes. Please try again later.'
+        );
+        return of([]);
+      }),
+      finalize(() => this.loadingSubject.next(false))
+    );
   }
 
   fetchMoreRecipes(
@@ -113,7 +127,7 @@ export class RecipeService {
     return this.http.get(this.apiUrl, { params }).pipe(
       map((response: any) => {
         if (response.results.length < number) {
-          this.noMoreRecipesSubject.next(true); // No more recipes available
+          this.noMoreRecipesSubject.next(true);
         }
         return response.results.map((recipe: any) => ({
           ...recipe,
@@ -123,6 +137,13 @@ export class RecipeService {
             '-'
           )}-${recipe.id}`,
         }));
+      }),
+      catchError((error) => {
+        console.error('Error fetching more recipes:', error);
+        this.errorSubject.next(
+          'Failed to load more recipes. Please try again later.'
+        );
+        return of([]);
       }),
       finalize(() => this.loadingSubject.next(false)),
       map((recipes) => {
@@ -160,14 +181,18 @@ export class RecipeService {
             )}-${recipe.id}`,
           }));
         }),
+        catchError((error) => {
+          console.error('Error fetching more recipes:', error);
+          this.errorSubject.next(
+            'Failed to load more recipes. Please try again later.'
+          );
+          return of([]);
+        }),
         finalize(() => this.loadingSubject.next(false))
       )
       .subscribe({
         next: (recipes) => {
           this.recipesSubject.next(recipes);
-        },
-        error: (error) => {
-          this.errorSubject.next(error.message);
         },
       });
   }
@@ -212,40 +237,28 @@ export class RecipeService {
     return this.getRecipesByCuisine('', 9);
   }
 
-  private localStorageKey = 'savedRecipes';
-
-  saveRecipe(recipe: any): void {
-    const savedRecipes = this.getSavedRecipesFromLocalStorage();
-    if (!savedRecipes.find((savedRecipe) => savedRecipe.id === recipe.id)) {
-      savedRecipes.push(recipe);
-      localStorage.setItem(this.localStorageKey, JSON.stringify(savedRecipes));
-      console.log('Recipe saved successfully!');
-    }
-  }
-
-  unsaveRecipe(recipeId: string): void {
-    const savedRecipes = this.getSavedRecipesFromLocalStorage().filter(
-      (recipe) => recipe.id !== recipeId
+  getSavedRecipesForUser(userId: number): Observable<number[]> {
+    return this.http.get<number[]>(
+      `/api/recipes/saved-recipes?userId=${userId}`
     );
-    localStorage.setItem(this.localStorageKey, JSON.stringify(savedRecipes));
-    console.log('Recipe unsaved successfully!');
   }
 
-  getSavedRecipes(): any[] {
-    return this.getSavedRecipesFromLocalStorage();
+  saveRecipe(recipe: any): Observable<any> {
+    return this.http.post(`/api/recipes/saved-recipes`, { recipe }).pipe(
+      catchError((error) => {
+        console.error('Save recipe failed', error);
+        return throwError(() => new Error('Save recipe failed'));
+      })
+    );
   }
 
-  private getSavedRecipesFromLocalStorage(): any[] {
-    const savedRecipes = localStorage.getItem(this.localStorageKey);
-    return savedRecipes ? JSON.parse(savedRecipes) : [];
-  }
-
-  updateRecipeSavedState(recipes: any[]): void {
-    const savedRecipes = this.getSavedRecipesFromLocalStorage();
-    recipes.forEach((recipe) => {
-      recipe.saved = savedRecipes.some(
-        (savedRecipe) => savedRecipe.id === recipe.id
-      );
-    });
+  unsaveRecipe(userId: number, recipeId: number): Observable<any> {
+    const url = `/api/recipes/saved-recipes?userId=${userId}&recipeId=${recipeId}`;
+    return this.http.delete(url).pipe(
+      catchError((error) => {
+        console.error('Unsave recipe failed', error);
+        return throwError(() => new Error('Unsave recipe failed'));
+      })
+    );
   }
 }

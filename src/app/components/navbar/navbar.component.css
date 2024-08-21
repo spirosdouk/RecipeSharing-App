@@ -37,3 +37,11 @@
     margin: 0 15px;
   }
   
+  .dropdown-menu {
+    min-width: 150px;
+    padding: 0.5rem;
+  }
+  
+  .dropdown-menu .dropdown-item {
+    padding: 0.5rem 1rem;
+  }

@@ -213,19 +213,15 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.recipeService.getFeaturedRecipes().subscribe((recipes) => {
       this.featuredRecipes = recipes;
-      this.recipeService.updateRecipeSavedState(this.featuredRecipes);
     });
     this.recipeService.getChineseRecipes().subscribe((recipes) => {
       this.chineseRecipes = recipes;
-      this.recipeService.updateRecipeSavedState(this.chineseRecipes);
     });
     this.recipeService.getItalianRecipes().subscribe((recipes) => {
       this.italianRecipes = recipes;
-      this.recipeService.updateRecipeSavedState(this.italianRecipes);
     });
     this.recipeService.getGreekRecipes().subscribe((recipes) => {
       this.greekRecipes = recipes;
-      this.recipeService.updateRecipeSavedState(this.greekRecipes);
     });
   }
 }

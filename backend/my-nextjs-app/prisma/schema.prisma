@@ -14,4 +14,31 @@ model User {
   password   String
   createdAt  DateTime @default(now())
   updateDate DateTime @updatedAt
+
+  savedRecipes SavedRecipe[]
+}
+
+model Recipe {
+  id             Int      @id @default(autoincrement())
+  title          String
+  image          String
+  sourceUrl      String
+  readyInMinutes Int
+  createdAt      DateTime @default(now())
+  updateDate     DateTime @updatedAt
+
+  savedBy SavedRecipe[]
+}
+
+model SavedRecipe {
+  id Int @id @default(autoincrement())
+
+  User     User?   @relation(fields: [userId], references: [id])
+  userId   Int?
+  Recipe   Recipe? @relation(fields: [recipeId], references: [id])
+  recipeId Int?
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, recipeId])
 }

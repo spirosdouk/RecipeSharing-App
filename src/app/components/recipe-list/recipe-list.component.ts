@@ -1,7 +1,7 @@
-// src/app/components/recipe-list/recipe-list.component.ts
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RecipeService } from '../../services/recipe.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   standalone: true,
@@ -82,27 +82,48 @@ import { RecipeService } from '../../services/recipe.service';
   ],
   imports: [CommonModule],
 })
-export class RecipeListComponent implements OnInit {
+export class RecipeListComponent {
   @Input() recipes: any[] = [];
 
-  constructor(private recipeService: RecipeService) {}
-
-  ngOnInit() {
-    const savedRecipes = this.recipeService.getSavedRecipes();
-    this.recipes.forEach((recipe) => {
-      recipe.saved = savedRecipes.some(
-        (savedRecipe) => savedRecipe.id === recipe.id
-      );
-    });
-  }
+  constructor(
+    private authService: AuthService,
+    private recipeService: RecipeService
+  ) {}
 
   toggleSave(recipe: any): void {
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      console.error('User ID is not available.');
+      return;
+    }
+
+    const recipeData = {
+      userId: userId,
+      recipeId: recipe.id,
+      title: recipe.title,
+      image: recipe.image,
+      sourceUrl: recipe.sourceUrl,
+      readyInMinutes: recipe.readyInMinutes,
+    };
+
     if (!recipe.saved) {
-      this.recipeService.saveRecipe(recipe);
-      recipe.saved = true;
+      this.recipeService.saveRecipe(recipeData).subscribe({
+        next: () => {
+          recipe.saved = true;
+        },
+        error: (error) => {
+          console.error('Save recipe failed', error);
+        },
+      });
     } else {
-      this.recipeService.unsaveRecipe(recipe.id);
-      recipe.saved = false;
+      this.recipeService.unsaveRecipe(Number(userId), recipe.id).subscribe({
+        next: () => {
+          recipe.saved = false;
+        },
+        error: (error) => {
+          console.error('Unsave recipe failed', error);
+        },
+      });
     }
   }
 }
