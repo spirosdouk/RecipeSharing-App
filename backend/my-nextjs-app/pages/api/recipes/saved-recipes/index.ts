@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from '@/lib/prisma'; // Assuming you're using Prisma for database interactions
+import prisma from '@/lib/prisma';
 
 export default async function handler(
   req: NextApiRequest,
@@ -35,8 +35,14 @@ async function getSavedRecipesForUser(
       include: { Recipe: true },
     });
 
-    const recipeData = savedRecipes.map((sr) => sr.Recipe);
+    const recipeData = savedRecipes.map((sr) => {
+      return {
+        id: sr.recipeId,
+        ...sr.Recipe,
+      };
+    });
 
+    console.log('Fetched saved recipes for user:', recipeData);
     res.status(200).json(recipeData);
   } catch (error) {
     console.error('Error fetching saved recipes:', error);

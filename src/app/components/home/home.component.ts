@@ -8,6 +8,8 @@ import { RecipeListComponent } from '../recipe-list/recipe-list.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { RecipeService } from '../../services/recipe.service';
+import { Recipe } from '../../models/recipe.models';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   standalone: true,
@@ -207,21 +209,51 @@ export class HomeComponent implements OnInit {
   chineseRecipes: any[] = [];
   italianRecipes: any[] = [];
   greekRecipes: any[] = [];
+  private savedRecipeIds: number[] = [];
 
-  constructor(private recipeService: RecipeService) {}
+  constructor(
+    private recipeService: RecipeService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
+    this.loadSavedRecipeIds();
+    this.loadRecipes();
+  }
+
+  loadSavedRecipeIds(): void {
+    const userId = this.authService.getUserId();
+    if (userId) {
+      this.recipeService.getSavedRecipesForUser(Number(userId)).subscribe({
+        next: (recipes) => {
+          this.savedRecipeIds = recipes.map((recipe) => recipe.id);
+        },
+        error: (error) => console.error('Error fetching saved recipes:', error),
+      });
+    }
+  }
+
+  loadRecipes(): void {
     this.recipeService.getFeaturedRecipes().subscribe((recipes) => {
-      this.featuredRecipes = recipes;
+      this.featuredRecipes = this.markRecipesAsLiked(recipes);
     });
     this.recipeService.getChineseRecipes().subscribe((recipes) => {
-      this.chineseRecipes = recipes;
+      this.chineseRecipes = this.markRecipesAsLiked(recipes);
     });
     this.recipeService.getItalianRecipes().subscribe((recipes) => {
-      this.italianRecipes = recipes;
+      this.italianRecipes = this.markRecipesAsLiked(recipes);
     });
     this.recipeService.getGreekRecipes().subscribe((recipes) => {
-      this.greekRecipes = recipes;
+      this.greekRecipes = this.markRecipesAsLiked(recipes);
+    });
+  }
+
+  markRecipesAsLiked(recipes: Recipe[]): Recipe[] {
+    return recipes.map((recipe) => {
+      return {
+        ...recipe,
+        saved: this.savedRecipeIds.includes(recipe.id),
+      };
     });
   }
 }

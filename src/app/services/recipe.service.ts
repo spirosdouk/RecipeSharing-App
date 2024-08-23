@@ -4,14 +4,7 @@ import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { map, finalize, catchError, switchMap } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 import { AuthService } from './auth.service';
-
-interface Recipe {
-  id: number;
-  title: string;
-  image: string;
-  sourceUrl: string;
-  saved?: boolean;
-}
+import { Recipe } from '../models/recipe.models';
 
 @Injectable({
   providedIn: 'root',
@@ -237,8 +230,8 @@ export class RecipeService {
     return this.getRecipesByCuisine('', 9);
   }
 
-  getSavedRecipesForUser(userId: number): Observable<number[]> {
-    return this.http.get<number[]>(
+  getSavedRecipesForUser(userId: number): Observable<Recipe[]> {
+    return this.http.get<Recipe[]>(
       `/api/recipes/saved-recipes?userId=${userId}`
     );
   }

@@ -26,7 +26,7 @@ export default async function handler(
   } catch (error: any) {
     console.error('Error fetching data from Spoonacular API:', error.message);
     res.status(error.response?.status || 500).json({
-      error: 'Failed to fetch data from Spoonacular API',
+      error: 'Failed to fetch data from Spoonacularz API',
       details: error.message,
     });
   }

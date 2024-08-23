@@ -110,18 +110,22 @@ export class RecipeListComponent {
       this.recipeService.saveRecipe(recipeData).subscribe({
         next: () => {
           recipe.saved = true;
+          console.log('Recipe saved:', recipe);
         },
         error: (error) => {
-          console.error('Save recipe failed', error);
+          console.error('Save recipe failed:', error);
+          console.error('Failed data:', recipeData);
         },
       });
     } else {
       this.recipeService.unsaveRecipe(Number(userId), recipe.id).subscribe({
         next: () => {
           recipe.saved = false;
+          console.log('Recipe unsaved:', recipe);
         },
         error: (error) => {
-          console.error('Unsave recipe failed', error);
+          console.error('Unsave recipe failed:', error);
+          console.error('Failed data:', recipeData);
         },
       });
     }

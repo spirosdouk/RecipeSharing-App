@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Observable, Subject } from 'rxjs';
-import { takeUntil, switchMap } from 'rxjs/operators';
+import { Observable, of, Subject } from 'rxjs';
+import { takeUntil, switchMap, catchError } from 'rxjs/operators';
 import { RecipeService } from '../../services/recipe.service';
 import { SearchService } from '../../services/search.service';
 import { RecipeListComponent } from '../recipe-list/recipe-list.component';
@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { AuthService } from '../../services/auth.service';
+import { Recipe } from '../../models/recipe.models';
 
 @Component({
   standalone: true,
@@ -74,10 +75,10 @@ export class CustomSearchComponent implements OnInit, OnDestroy {
   intolerances: string[] = [];
   offset: number = 0;
   limit: number = 10;
-  private destroy$ = new Subject<void>();
-  private noMoreRecipes: boolean = false;
-  private fetching: boolean = false;
+  noMoreRecipes: boolean = false;
+  fetching: boolean = false;
   private savedRecipes: number[] = [];
+  private destroy$ = new Subject<void>();
 
   constructor(
     private recipeService: RecipeService,
@@ -91,15 +92,10 @@ export class CustomSearchComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadRecipes();
-
     this.searchService.searchEvent$
       .pipe(takeUntil(this.destroy$))
       .subscribe((searchParams) => {
-        this.query = searchParams.query;
-        this.cuisine = searchParams.cuisine;
-        this.intolerances = searchParams.intolerances;
-        this.offset = 0;
-        this.noMoreRecipes = false;
+        this.updateSearchParameters(searchParams);
         this.loadRecipes();
       });
 
@@ -108,6 +104,18 @@ export class CustomSearchComponent implements OnInit, OnDestroy {
       .subscribe((noMore) => {
         this.noMoreRecipes = noMore;
       });
+  }
+
+  updateSearchParameters(params: {
+    query: string;
+    cuisine: string;
+    intolerances: string[];
+  }): void {
+    this.query = params.query;
+    this.cuisine = params.cuisine;
+    this.intolerances = params.intolerances;
+    this.offset = 0;
+    this.noMoreRecipes = false;
   }
 
   ngOnDestroy(): void {
@@ -119,51 +127,63 @@ export class CustomSearchComponent implements OnInit, OnDestroy {
     const userId = this.authService.getUserId();
 
     if (userId) {
-      this.recipeService
-        .getSavedRecipesForUser(Number(userId))
-        .pipe(
-          switchMap((savedRecipeIds: number[]) => {
-            this.savedRecipes = savedRecipeIds;
-            return this.recipeService.getRecipes(
-              this.query,
-              this.offset,
-              this.limit,
-              this.cuisine,
-              this.intolerances
-            );
-          }),
-          takeUntil(this.destroy$)
-        )
-        .subscribe({
-          next: (recipes) => {
-            this.recipes = recipes;
-            this.recipes.forEach((recipe) => {
-              recipe.saved = this.savedRecipes.includes(recipe.id);
-            });
-          },
-          error: (error) => {
-            console.error('Error fetching recipes:', error);
-          },
-        });
+      this.recipeService.getSavedRecipesForUser(Number(userId)).subscribe({
+        next: (savedRecipes: Recipe[]) => {
+          console.log('Saved recipes fetched:', savedRecipes);
+          this.savedRecipes = savedRecipes.map((recipe) => recipe.id);
+          this.fetchAndMarkRecipes();
+        },
+        error: (error) => {
+          console.error('Failed to fetch saved recipes:', error);
+        },
+      });
     } else {
-      this.recipeService
-        .getRecipes(
-          this.query,
-          this.offset,
-          this.limit,
-          this.cuisine,
-          this.intolerances
-        )
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (recipes) => {
-            this.recipes = recipes;
-          },
-          error: (error) => {
-            console.error('Error fetching recipes:', error);
-          },
-        });
+      console.error('User is not logged in');
     }
+  }
+
+  fetchAndMarkRecipes(): void {
+    const userId = this.authService.getUserId();
+
+    if (!userId) {
+      console.error('User is not logged in');
+      return;
+    }
+
+    this.recipeService
+      .getSavedRecipesForUser(Number(userId))
+      .pipe(
+        switchMap((savedRecipes) => {
+          // Directly store the IDs of saved recipes
+          this.savedRecipes = savedRecipes.map((recipe) => recipe.id);
+
+          // Fetch recipes based on current search parameters
+          return this.recipeService.getRecipes(
+            this.query,
+            this.offset,
+            this.limit,
+            this.cuisine,
+            this.intolerances
+          );
+        }),
+        catchError((error) => {
+          console.error('Error fetching recipes:', error);
+          return of([]); // Return empty array on error to continue the stream
+        })
+      )
+      .subscribe((recipes) => {
+        // Mark recipes as saved if their ID is in savedRecipeIds
+        this.recipes = recipes.map((recipe) => ({
+          ...recipe,
+          saved: this.savedRecipes.includes(recipe.id),
+        }));
+
+        if (this.recipes.length === 0 && this.offset === 0) {
+          this.error$ = of(
+            'No recipes found with the current search criteria.'
+          );
+        }
+      });
   }
 
   openFilterDialog(): void {
