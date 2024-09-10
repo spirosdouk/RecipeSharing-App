@@ -23,6 +23,10 @@ Through this project, I have gained the following skills:
 - **Managing application state** effectively using services and RxJS observables to handle data streams within the app.
 - **Implementing database interactions** with Prisma and SQLite: Set up and managed a relational database to store and retrieve recipe data efficiently.
 
+## How to Run
+
+Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+
 ## Build
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
